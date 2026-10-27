@@ -142,7 +142,7 @@ public static partial class L
         d["# Wetter {0}"] = "# Weather {0}";
         d["Frequenz MHz;Pol;Symbolrate kS;Band;Status;Stärke %;Qualität %;C/N dB;Pegel dBµV;MER dB;BER;Lock-Zeit s;Zeit"] =
             "Frequency MHz;Pol;Symbol rate kS;Band;Status;Strength %;Quality %;C/N dB;Level dBµV;MER dB;BER;Lock time s;Time";
-        d["Die ZIP-Datei ist kein Standort-Export des DurLine Scanners."] = "The ZIP file is not a DurLine Scanner site export.";
+        d["Die ZIP-Datei ist kein Standort-Export des DUR-line Scanners."] = "The ZIP file is not a DUR-line Scanner site export.";
 
         // ---------------------------------------------------------------- Sender- und Transponderliste
         d["Daten"] = "Data";

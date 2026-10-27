@@ -1,6 +1,6 @@
-# Durline SF 4000 BT – Bluetooth-Protokoll
+# DUR-line SF 4000 BT – Bluetooth-Protokoll
 
-Beschreibung der Bluetooth-LE-Schnittstelle, wie sie der DurLine Scanner verwendet. Geprüft am Gerät
+Beschreibung der Bluetooth-LE-Schnittstelle, wie sie der DUR-line Scanner verwendet. Geprüft am Gerät
 (meldet sich als „Finder S2“, Modell `260B`) am 27.10.2026. Mit anderen Geräten oder Firmware-Ständen
 wurde nicht getestet. Der Scanner verwendet nur `A5F0`, `A5F2`, `A5F3`, `A5F5` und `A5F6` – alle am Gerät
 geprüft. Die übrigen Befehle sind nur der Vollständigkeit halber aufgeführt; Befehle, die ins Gerät

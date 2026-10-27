@@ -1,6 +1,6 @@
-# DurLine Scanner – Benutzerhandbuch
+# DUR-line Scanner – Benutzerhandbuch
 
-Der DurLine Scanner ist ein Windows-Programm für das Sat-Messgerät **Durline SF 4000 BT**. Es verbindet sich
+Der DUR-line Scanner ist ein Windows-Programm für das Sat-Messgerät **DUR-line SF 4000 BT**. Es verbindet sich
 per Bluetooth mit dem Gerät, misst automatisch alle Transponder eines Satelliten und stellt die Ergebnisse als
 Messreihen dar. So sieht man auf einen Blick, wo es Empfangslöcher gibt, ob eine ZF-Ebene zu schwach oder zu stark
 ankommt und wie gut eine Anlage im Vergleich zur Erwartung arbeitet.
@@ -35,7 +35,7 @@ ankommt und wie gut eine Anlage im Vergleich zur Erwartung arbeitet.
 
 ## 1. Getestete Hardware und Voraussetzungen
 
-> **Wichtig:** Das Programm wurde **nur mit einem einzigen Gerät getestet**: Durline SF 4000 BT, das sich per
+> **Wichtig:** Das Programm wurde **nur mit einem einzigen Gerät getestet**: DUR-line SF 4000 BT, das sich per
 > Bluetooth als **„Finder S2-…“** meldet und die Modellkennung **260B** liefert. Andere Geräte, Baureihen oder
 > Firmware-Stände wurden nicht geprüft. Sie funktionieren möglicherweise, möglicherweise auch nicht.
 
@@ -67,7 +67,7 @@ Startmenü und auf Wunsch eine Desktop-Verknüpfung an. Eine separate .NET-Insta
 
 1. Messgerät einschalten. Eine eventuell verbundene Handy-App trennen oder schließen – das Gerät kann nur mit
    einem Partner gleichzeitig verbunden sein.
-2. Im DurLine Scanner oben rechts **Verbinden** klicken. Das Programm sucht nach einem Gerät namens „Finder …“.
+2. Im DUR-line Scanner oben rechts **Verbinden** klicken. Das Programm sucht nach einem Gerät namens „Finder …“.
 3. Fragt Windows nach einer **PIN**, `000001` eingeben.
 
 Nach der ersten Verbindung merkt sich das Programm die Bluetooth-Adresse. Der grüne Punkt neben dem Gerätenamen
@@ -393,7 +393,7 @@ Linke Liste nach Wetter filtern oder in **Vergleich** auf **Gleiche Bedingungen 
 
 ## 19. Grenzen und Hinweise
 
-- **Nur mit einem Gerät getestet** (Durline SF 4000 BT, „Finder S2“, Modell 260B).
+- **Nur mit einem Gerät getestet** (DUR-line SF 4000 BT, „Finder S2“, Modell 260B).
 - Der Pegel des Messgeräts ist nicht kalibriert; Absolutwerte können um einige dB abweichen.
 - Die BER bei DVB-S2 ist nicht verlässlich und wird nicht bewertet.
 - Die Erwartungswerte der Ampel sind Richtwerte aus einem vereinfachten Linkbudget.

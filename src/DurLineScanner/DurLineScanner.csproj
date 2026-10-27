@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <AssemblyTitle>DurLine Scanner</AssemblyTitle>
+    <AssemblyTitle>DUR-line Scanner</AssemblyTitle>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <!-- Fluent-Theme (Application.ThemeMode) ist in .NET noch als experimentell markiert -->
     <NoWarn>$(NoWarn);WPF0001</NoWarn>

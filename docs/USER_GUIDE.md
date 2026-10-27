@@ -1,6 +1,6 @@
-# DurLine Scanner – User Guide
+# DUR-line Scanner – User Guide
 
-The DurLine Scanner is a Windows program for the **Durline SF 4000 BT** satellite meter. It connects to the device
+The DUR-line Scanner is a Windows program for the **DUR-line SF 4000 BT** satellite meter. It connects to the device
 via Bluetooth, automatically measures all transponders of a satellite and presents the results as scans. This lets
 you see at a glance where there are reception gaps, whether an IF plane arrives too weak or too strong, and how well
 an installation performs compared with what is expected.
@@ -35,7 +35,7 @@ an installation performs compared with what is expected.
 
 ## 1. Tested hardware and requirements
 
-> **Important:** The program was **tested with only a single device**: the Durline SF 4000 BT, which identifies
+> **Important:** The program was **tested with only a single device**: the DUR-line SF 4000 BT, which identifies
 > itself via Bluetooth as **"Finder S2-…"** and reports the model ID **260B**. Other devices, product lines or
 > firmware versions have not been tested. They may or may not work.
 
@@ -67,7 +67,7 @@ and, if you wish, a desktop shortcut. A separate .NET installation is not requir
 
 1. Switch on the meter. Disconnect or close any phone app that may be connected – the device can only be connected
    to one partner at a time.
-2. In the DurLine Scanner, click **Connect** at the top right. The program searches for a device named "Finder …".
+2. In the DUR-line Scanner, click **Connect** at the top right. The program searches for a device named "Finder …".
 3. If Windows asks for a **PIN**, enter `000001`.
 
 After the first connection the program remembers the Bluetooth address. The green dot next to the device name
@@ -392,7 +392,7 @@ Filter the list on the left by weather, or click **Tick same conditions** in **C
 
 ## 19. Limits and notes
 
-- **Tested with only one device** (Durline SF 4000 BT, "Finder S2", model 260B).
+- **Tested with only one device** (DUR-line SF 4000 BT, "Finder S2", model 260B).
 - The meter's level is not calibrated; absolute values can deviate by a few dB.
 - BER for DVB-S2 is not reliable and is not rated.
 - The traffic light's expected values are guidelines from a simplified link budget.

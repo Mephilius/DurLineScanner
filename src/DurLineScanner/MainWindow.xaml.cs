@@ -910,7 +910,7 @@ public partial class MainWindow : Window
         var host = new Border { Padding = new Thickness(20), Child = LiveContent };
         _fullscreen = new Window
         {
-            Title = L.T("DurLine Scanner – Live-Messung"),
+            Title = L.T("DUR-line Scanner – Live-Messung"),
             Owner = this,
             WindowStyle = WindowStyle.None,
             ResizeMode = ResizeMode.NoResize,

@@ -73,7 +73,7 @@ jobs:
         if: github.ref_type == 'tag'
         uses: softprops/action-gh-release@v2
         with:
-          name: DurLine Scanner ${{ steps.version.outputs.version }}
+          name: DUR-line Scanner ${{ steps.version.outputs.version }}
           generate_release_notes: true
           # Versionen unter 1.0 und Tags mit Zusatz (z.B. v1.1.0-beta) als Vorabversion
           prerelease: ${{ startsWith(steps.version.outputs.version, '0.') || contains(steps.version.outputs.version, '-') }}

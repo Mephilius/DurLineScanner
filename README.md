@@ -1,12 +1,12 @@
-# DurLine Scanner
+# DUR-line Scanner
 
-**Windows app for the Durline SF 4000 BT satellite meter** – automated transponder scans, measurement series,
+**Windows app for the DUR-line SF 4000 BT satellite meter** – automated transponder scans, measurement series,
 level analysis per IF plane, live alignment view with gauges, and a traffic-light verdict based on dish size,
 location and weather.
 
 *Deutsch: [README.de.md](README.de.md)*
 
-> **Tested with one device only:** Durline SF 4000 BT, reporting via Bluetooth as “Finder S2-…”, model ID 260B.
+> **Tested with one device only:** DUR-line SF 4000 BT, reporting via Bluetooth as “Finder S2-…”, model ID 260B.
 > Other models or firmware versions have not been tested.
 
 ## Features
@@ -76,7 +76,7 @@ or reset it are never sent.
 
 ## License
 
-© 2026 DurLine Scanner contributors. Licensed under the [GNU General Public License v3.0](LICENSE).
+© 2026 DUR-line Scanner contributors. Licensed under the [GNU General Public License v3.0](LICENSE).
 
 ## Third-party data
 

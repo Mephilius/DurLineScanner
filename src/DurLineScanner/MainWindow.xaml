@@ -4,7 +4,7 @@
         xmlns:sp="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
         xmlns:c="clr-namespace:DurLineScanner.Controls"
         xmlns:l="clr-namespace:DurLineScanner.Localization"
-        Title="DurLine Scanner" Height="920" Width="1480" MinWidth="1100" MinHeight="720"
+        Title="DUR-line Scanner" Height="920" Width="1480" MinWidth="1100" MinHeight="720"
         WindowStartupLocation="CenterScreen" Closing="Window_Closing" PreviewKeyDown="Window_PreviewKeyDown"
         Background="{StaticResource AppBackground}" FontFamily="Segoe UI" FontSize="13" Icon="/Assets/app.ico">
 
@@ -26,7 +26,7 @@
             <Button Grid.Column="2" Content="⚙  Einstellungen" Click="SettingsButton_Click" Margin="10,0,0,0"
                     VerticalAlignment="Center" ToolTip="Standorte verwalten, Receiver für die Senderliste eintragen" />
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="DurLine Scanner" FontSize="22" FontWeight="SemiBold" />
+                <TextBlock Text="DUR-line Scanner" FontSize="22" FontWeight="SemiBold" />
                 <TextBlock Text="Sat-Messung mit dem SF 4000 BT" Style="{StaticResource Hint}"
                            VerticalAlignment="Bottom" Margin="12,0,0,3" />
             </StackPanel>

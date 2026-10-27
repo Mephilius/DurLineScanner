@@ -175,7 +175,7 @@ public static partial class L
         d["Live-Messung unterbrochen: {0}"] = "Live measurement interrupted: {0}";
         d["gestoppt"] = "stopped";
         d["Live-Messung läuft im Vollbild – Esc oder F11 kehrt zurück."] = "Live measurement is running in full screen – Esc or F11 returns.";
-        d["DurLine Scanner – Live-Messung"] = "DurLine Scanner – Live measurement";
+        d["DUR-line Scanner – Live-Messung"] = "DUR-line Scanner – Live measurement";
         d["✕  Vollbild beenden (Esc)"] = "✕  Exit full screen (Esc)";
         d["Reserve {0:+0.0;-0.0} dB"] = "Margin {0:+0.0;-0.0} dB";
         d["sucht …"] = "searching …";

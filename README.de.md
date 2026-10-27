@@ -1,12 +1,12 @@
-# DurLine Scanner
+# DUR-line Scanner
 
-**Windows-Programm für das Sat-Messgerät Durline SF 4000 BT** – automatische Transponder-Scans, Messreihen,
+**Windows-Programm für das Sat-Messgerät DUR-line SF 4000 BT** – automatische Transponder-Scans, Messreihen,
 Pegelauswertung pro ZF-Ebene, Live-Ansicht mit Gauges zum Ausrichten und eine Ampel-Bewertung anhand von
 Schüsselgröße, Standort und Wetter.
 
 *English: [README.md](README.md)*
 
-> **Nur mit einem Gerät getestet:** Durline SF 4000 BT, meldet sich per Bluetooth als „Finder S2-…“, Modellkennung
+> **Nur mit einem Gerät getestet:** DUR-line SF 4000 BT, meldet sich per Bluetooth als „Finder S2-…“, Modellkennung
 > 260B. Andere Modelle oder Firmware-Stände wurden nicht getestet.
 
 ## Funktionen
@@ -75,7 +75,7 @@ Gerät ändern oder es zurücksetzen, werden nie gesendet.
 
 ## Lizenz
 
-© 2026 DurLine Scanner contributors. Lizenziert unter der [GNU General Public License v3.0](LICENSE).
+© 2026 DUR-line Scanner contributors. Lizenziert unter der [GNU General Public License v3.0](LICENSE).
 
 ## Daten von Dritten
 

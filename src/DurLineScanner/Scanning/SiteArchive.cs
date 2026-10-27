@@ -68,7 +68,7 @@ public static class SiteArchive
                         && e.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             .ToList();
         if (site is null && sessionEntries.Count == 0)
-            throw new InvalidDataException(L.T("Die ZIP-Datei ist kein Standort-Export des DurLine Scanners."));
+            throw new InvalidDataException(L.T("Die ZIP-Datei ist kein Standort-Export des DUR-line Scanners."));
 
         foreach (var entry in sessionEntries)
         {

@@ -1,4 +1,4 @@
-// BLE-Explorer für das Durline SF 4000 BT.
+// BLE-Explorer für das DUR-line SF 4000 BT.
 // Zweck: Services/Characteristics des Geräts ermitteln und den Datenverkehr mitschneiden,
 // damit das (undokumentierte) Protokoll analysiert werden kann.
 //
