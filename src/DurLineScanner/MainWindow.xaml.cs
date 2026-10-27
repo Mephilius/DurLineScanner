@@ -84,7 +84,8 @@ public partial class MainWindow : Window
         LivePlaneBox.SelectedIndex = 0;
         ConfigureGauges(null);
         RenderCharts();
-        if (_sessions.Count > 0) SessionList.SelectedIndex = 0; // neueste Messreihe anzeigen
+        ApplySessionFilter();
+        ShowFirstSessionOfSite(); // neueste Messreihe des Standorts anzeigen
         Loaded += async (_, _) =>
         {
             // Die Transponderliste wird nicht mitgeliefert – beim ersten Start herunterladen
@@ -227,6 +228,9 @@ public partial class MainWindow : Window
                 : L.T("ohne Koordinaten");
             SiteBox.ToolTip = L.F("{0}\n{1}\n{2}\nSchüssel {3} cm · LNB {4:0.#} dB", site.Name, site.Address, where, site.DishCm, site.LnbGainDb);
         }
+        UpdateLocationLists();
+        ApplySessionFilter();
+        ShowFirstSessionOfSite();
         RefreshLiveLight();
     }
 
@@ -1203,15 +1207,17 @@ public partial class MainWindow : Window
     /// <summary>Raumvorschläge (bereits gemessene zuerst) und Filterliste aus den bisherigen Messreihen.</summary>
     private void UpdateLocationLists()
     {
+        // Vorschläge und Filter nur aus den Messreihen des gewählten Standorts
+        var ofSite = _sessions.Where(s => OfSelectedSite(s.Session)).ToList();
         var typed = RoomBox.Text;
-        var measured = _sessions.Select(s => s.Session.Room).OfType<string>()
+        var measured = ofSite.Select(s => s.Session.Room).OfType<string>()
             .Distinct(StringComparer.CurrentCultureIgnoreCase).Order().ToList();
         RoomBox.ItemsSource = measured.Concat(Rooms.All.Where(r => !measured.Contains(r, StringComparer.CurrentCultureIgnoreCase))).ToList();
         RoomBox.Text = typed;
 
         var selectedFilter = SessionFilterBox.SelectedItem as string;
         var filters = new List<string> { AllLocations };
-        filters.AddRange(_sessions.Select(s => LocationKey(s.Session)).Distinct().Order());
+        filters.AddRange(ofSite.Select(s => LocationKey(s.Session)).Distinct().Order());
         SessionFilterBox.ItemsSource = filters;
         SessionFilterBox.SelectedItem = filters.Contains(selectedFilter ?? "") ? selectedFilter : AllLocations;
     }
@@ -1219,20 +1225,35 @@ public partial class MainWindow : Window
     private static string LocationKey(ScanSession s) =>
         (s.LocationKind == LocationKind.Socket ? L.T("Dose") : L.T("LNB-Port")) + " " + (s.LocationName.Length > 0 ? s.LocationName : "?");
 
-    private void SessionFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void SessionFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => ApplySessionFilter();
+
+    /// <summary>Messreihe gehört zum oben gewählten Standort? Ohne gewählten Standort zählen alle.</summary>
+    private bool OfSelectedSite(ScanSession s) => SelectedSite is not { } site || s.Site?.Id == site.Id;
+
+    /// <summary>Liste der Messreihen: nur der gewählte Standort, dazu die Filter nach Messort und Wetter.</summary>
+    private void ApplySessionFilter()
     {
         if (!IsInitialized) return;
         var location = SessionFilterBox.SelectedItem as string;
         var weather = (WeatherFilterBox.SelectedItem as WeatherOption)?.Weather;
-        var view = System.Windows.Data.CollectionViewSource.GetDefaultView(_sessions);
         bool allLocations = location is null || location == AllLocations;
-        view.Filter = allLocations && weather is null
-            ? null
-            : o =>
-            {
-                var s = ((SessionItem)o).Session;
-                return (allLocations || LocationKey(s) == location) && (weather is null || s.Weather == weather);
-            };
+        System.Windows.Data.CollectionViewSource.GetDefaultView(_sessions).Filter = o =>
+        {
+            var s = ((SessionItem)o).Session;
+            return OfSelectedSite(s) && (allLocations || LocationKey(s) == location) && (weather is null || s.Weather == weather);
+        };
+    }
+
+    /// <summary>Nach einem Standortwechsel: neueste Messreihe des Standorts zeigen, bei leerem Standort nichts.</summary>
+    private void ShowFirstSessionOfSite()
+    {
+        if (_scanCts is not null) return; // ein laufender Scan bleibt sichtbar
+        foreach (var item in _sessions.Where(i => i.IsCompared && !OfSelectedSite(i.Session)))
+            item.IsCompared = false;
+
+        var first = _sessions.FirstOrDefault(i => OfSelectedSite(i.Session));
+        SessionList.SelectedItem = first;
+        if (first is null) ShowSession(new ScanSession());
     }
 
     /// <summary>Alle Messreihen mit Standort, Satellit und Wetter der angezeigten zum Vergleich anhaken.</summary>

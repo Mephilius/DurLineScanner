@@ -266,7 +266,7 @@ All measured values of the displayed scan, sortable by clicking the column heade
 
 ## 12. Managing, exporting and importing scans
 
-The list on the left shows all saved scans, newest first: colored **traffic-light dot**, measuring point, date,
+The list on the left shows the scans of the **site selected at the top**, newest first (switching the site switches the list; a site without scans shows an empty list): colored **traffic-light dot**, measuring point, date,
 lock and gaps, weather and site, note.
 
 - **Select** = display, **tick** = include in the comparison.

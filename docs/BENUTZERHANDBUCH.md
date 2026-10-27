@@ -267,7 +267,7 @@ Alle Messwerte der angezeigten Messreihe, sortierbar per Klick auf die Spaltenü
 
 ## 12. Messreihen verwalten, exportieren und importieren
 
-Die Liste links zeigt alle gespeicherten Messreihen, neueste zuerst: farbiger **Ampel-Punkt**, Messort, Datum,
+Die Liste links zeigt die Messreihen des **oben gewählten Standorts**, neueste zuerst (ein Standortwechsel wechselt auch die Liste; ein Standort ohne Messreihen zeigt eine leere Liste): farbiger **Ampel-Punkt**, Messort, Datum,
 Lock und Löcher, Wetter und Standort, Notiz.
 
 - **Auswählen** = anzeigen, **Häkchen** = zum Vergleich einblenden.
