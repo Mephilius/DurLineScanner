@@ -122,6 +122,19 @@ public class ChannelListTests
         Assert.Equal(expected, ReceiverChannelSource.BaseUri(
             new AppSettings { ReceiverKind = kind, ReceiverAddress = address, ReceiverHttps = https, ReceiverPort = port }).ToString());
 
+    [Fact]
+    public void ReceiverPassword_IsStoredEncryptedAndRestored()
+    {
+        var s = new AppSettings { ReceiverPassword = "geheim123" };
+        Assert.DoesNotContain("geheim", s.ReceiverPasswordProtected);
+        Assert.NotEmpty(s.ReceiverPasswordProtected);
+
+        // Wie nach dem Speichern und erneuten Laden: nur der verschlüsselte Wert wird übernommen
+        var reloaded = new AppSettings { ReceiverPasswordProtected = s.ReceiverPasswordProtected };
+        Assert.Equal("geheim123", reloaded.ReceiverPassword);
+        Assert.Equal(9, reloaded.ReceiverPassword.Length);
+    }
+
     [Theory]
     [InlineData("https://tv.example.de", "tv.example.de", true, null)]
     [InlineData("http://tvh:9982", "tvh", false, 9982)]
