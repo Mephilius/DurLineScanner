@@ -275,7 +275,7 @@ lock and gaps, weather and site, note.
   Excel).
 - **Delete**: removes the selected scan (with confirmation).
 - **Folder**: opens the storage folder.
-- **📦 Export site …**: packs the site selected above with **all its scans** into a ZIP file:
+- **📦 Export …**: packs the site selected above with **all its scans** into a ZIP file:
   `standort.json`, `messungen/*.json` (complete, can be read back in) and `csv/*.csv` (for Excel).
   Good for backing up, passing on or moving to another PC.
 - **Import …**: reads such a ZIP file. The site is created if it does not exist yet; scans that already exist are

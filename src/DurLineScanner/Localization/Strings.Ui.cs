@@ -49,7 +49,7 @@ public static partial class L
         d["Auswählen = anzeigen · Häkchen = zum Vergleich einblenden"] = "Select = show · Tick = overlay for comparison";
         d["Messreihen nach Messort filtern"] = "Filter scans by measuring point";
         d["Messreihen nach Wetter filtern – Scans bei gleichem Wetter vergleichen"] = "Filter scans by weather – compare scans taken in the same weather";
-        d["📦  Standort exportieren …"] = "📦  Export site …";
+        d["📦  Exportieren …"] = "📦  Export …";
         d["Standort (oben gewählt) mit allen seinen Messreihen als ZIP speichern – JSON zum Wiedereinlesen und CSV für Excel"] =
             "Save the site (selected above) with all its scans as a ZIP – JSON for re-importing and CSV for Excel";
         d["Importieren …"] = "Import …";

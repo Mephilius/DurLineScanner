@@ -275,7 +275,7 @@ Lock und Löcher, Wetter und Standort, Notiz.
 - **CSV-Export**: die ausgewählte Messreihe als CSV (Semikolon, deutsches Dezimalkomma) – öffnet direkt in Excel.
 - **Löschen**: entfernt die ausgewählte Messreihe (mit Rückfrage).
 - **Ordner**: öffnet den Speicherordner.
-- **📦 Standort exportieren …**: packt den oben gewählten Standort mit **allen seinen Messreihen** in eine ZIP-Datei:
+- **📦 Exportieren …**: packt den oben gewählten Standort mit **allen seinen Messreihen** in eine ZIP-Datei:
   `standort.json`, `messungen/*.json` (vollständig, wieder einlesbar) und `csv/*.csv` (für Excel).
   Gut zum Sichern, Weitergeben oder Umziehen auf einen anderen PC.
 - **Importieren …**: liest eine solche ZIP-Datei ein. Der Standort wird angelegt, falls er noch fehlt; Messreihen,

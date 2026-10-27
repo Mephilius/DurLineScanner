@@ -160,7 +160,7 @@
                     <ComboBox x:Name="WeatherFilterBox" DockPanel.Dock="Top" Margin="0,0,0,8"
                               SelectionChanged="SessionFilterBox_SelectionChanged" ToolTip="Messreihen nach Wetter filtern – Scans bei gleichem Wetter vergleichen" />
                     <UniformGrid DockPanel.Dock="Bottom" Columns="2" Margin="0,6,0,0">
-                        <Button Content="📦  Standort exportieren …" Click="ExportSiteButton_Click" Margin="0,0,3,0"
+                        <Button Content="📦  Exportieren …" Click="ExportSiteButton_Click" Margin="0,0,3,0"
                                 ToolTip="Standort (oben gewählt) mit allen seinen Messreihen als ZIP speichern – JSON zum Wiedereinlesen und CSV für Excel" />
                         <Button Content="Importieren …" Click="ImportSiteButton_Click" Margin="3,0,0,0"
                                 ToolTip="Standort-ZIP einlesen: Standort und Messreihen werden übernommen, vorhandene nicht doppelt" />
@@ -230,72 +230,6 @@
                                 </Grid.RowDefinitions>
                                 <sp:WpfPlot x:Name="PlotH" />
                                 <sp:WpfPlot x:Name="PlotV" Grid.Row="1" />
-                            </Grid>
-                        </DockPanel>
-                    </TabItem>
-
-                    <TabItem x:Name="LiveTab" Header="Live-Messung">
-                        <DockPanel x:Name="LiveContent" Margin="6">
-                            <Grid DockPanel.Dock="Top" Margin="0,4,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*" />
-                                    <ColumnDefinition Width="2.4*" />
-                                    <ColumnDefinition Width="3.4*" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Margin="0,0,10,0">
-                                    <TextBlock Text="Sender suchen (Ebene und Transponder folgen)" Style="{StaticResource FieldLabel}" />
-                                    <ComboBox x:Name="LiveChannelBox" IsEditable="True" IsTextSearchEnabled="False" StaysOpenOnEdit="True"
-                                              SelectionChanged="LiveChannelBox_SelectionChanged" KeyUp="LiveChannelBox_KeyUp"
-                                              ToolTip="Namen eintippen, z.B. „ZDF“ – dann aus der Liste wählen" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                                    <TextBlock Text="Ebene" Style="{StaticResource FieldLabel}" />
-                                    <ComboBox x:Name="LivePlaneBox" SelectionChanged="LivePlaneBox_SelectionChanged" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Text="Transponder (★ = Vorschlag aus der Messreihe)" Style="{StaticResource FieldLabel}" />
-                                    <ComboBox x:Name="LiveTransponderBox" SelectionChanged="LiveTransponderBox_SelectionChanged" />
-                                </StackPanel>
-                            </Grid>
-                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                    <Button x:Name="LiveStartButton" Content="▶  Live starten" Click="LiveStartButton_Click" IsEnabled="False"
-                                            Style="{StaticResource AccentButton}" MinWidth="120" Margin="8,0,8,0" />
-                                    <Button x:Name="LiveStopButton" Content="■  Stopp" Click="LiveStopButton_Click" IsEnabled="False"
-                                            MinWidth="80" Margin="0,0,8,0" />
-                                    <Button x:Name="MiniScanButton" Content="◔  Mini-Scan Ebene" Click="MiniScanButton_Click" IsEnabled="False" Margin="0,0,8,0"
-                                            ToolTip="Misst bis zu 5 gleichmäßig über die Ebene verteilte Transponder und zeigt Minimum und Maximum als violetten Bogen in den Gauges" />
-                                    <Button Content="Marken zurücksetzen" Click="ResetPeaksButton_Click" Margin="0,0,8,0"
-                                            ToolTip="Blaue Marke = bester Wert seit dem Start (hilfreich beim Ausrichten), violetter Bogen = Bereich des Mini-Scans" />
-                                    <Button x:Name="FullscreenButton" Content="⛶  Vollbild" Click="FullscreenButton_Click"
-                                            ToolTip="Live-Messung im Vollbild anzeigen (F11) – Esc kehrt zurück" />
-                                </StackPanel>
-                                <Border x:Name="LiveLockBadge" CornerRadius="12" Padding="12,3" Background="#B0B0B0" VerticalAlignment="Center">
-                                    <TextBlock x:Name="LiveLockText" Text="bereit" Foreground="White" FontWeight="SemiBold" />
-                                </Border>
-                                <TextBlock x:Name="LiveInfoText" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="10,0,0,0"
-                                           TextTrimming="CharacterEllipsis" />
-                            </DockPanel>
-
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="2*" />
-                                    <RowDefinition Height="2*" />
-                                    <RowDefinition Height="1.3*" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <Border Style="{StaticResource Card}" Margin="0,0,6,6" Padding="6"><c:GaugeControl x:Name="GaugeMer" /></Border>
-                                <Border Grid.Column="1" Style="{StaticResource Card}" Margin="3,0,3,6" Padding="6"><c:GaugeControl x:Name="GaugeCn" /></Border>
-                                <Border Grid.Column="2" Style="{StaticResource Card}" Margin="6,0,0,6" Padding="6"><c:GaugeControl x:Name="GaugeLevel" /></Border>
-                                <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,6,6" Padding="6"><c:GaugeControl x:Name="GaugeQuality" /></Border>
-                                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="3,0,3,6" Padding="6"><c:GaugeControl x:Name="GaugeStrength" /></Border>
-                                <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource Card}" Margin="6,0,0,6" Padding="6"><c:GaugeControl x:Name="GaugeBer" /></Border>
-                                <c:TrafficLight x:Name="LiveLight" Grid.Row="2" Margin="0,0,6,0" VisibleReasons="3" Compact="True" VerticalAlignment="Top" />
-                                <sp:WpfPlot x:Name="PlotLive" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" />
                             </Grid>
                         </DockPanel>
                     </TabItem>
@@ -456,6 +390,72 @@
                                 <DataGridTextColumn Header="Zeit" Binding="{Binding Timestamp, StringFormat=HH:mm:ss}" />
                             </DataGrid.Columns>
                         </DataGrid>
+                    </TabItem>
+
+                    <TabItem x:Name="LiveTab" Header="Live-Messung">
+                        <DockPanel x:Name="LiveContent" Margin="6">
+                            <Grid DockPanel.Dock="Top" Margin="0,4,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="2.4*" />
+                                    <ColumnDefinition Width="3.4*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Margin="0,0,10,0">
+                                    <TextBlock Text="Sender suchen (Ebene und Transponder folgen)" Style="{StaticResource FieldLabel}" />
+                                    <ComboBox x:Name="LiveChannelBox" IsEditable="True" IsTextSearchEnabled="False" StaysOpenOnEdit="True"
+                                              SelectionChanged="LiveChannelBox_SelectionChanged" KeyUp="LiveChannelBox_KeyUp"
+                                              ToolTip="Namen eintippen, z.B. „ZDF“ – dann aus der Liste wählen" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                    <TextBlock Text="Ebene" Style="{StaticResource FieldLabel}" />
+                                    <ComboBox x:Name="LivePlaneBox" SelectionChanged="LivePlaneBox_SelectionChanged" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Transponder (★ = Vorschlag aus der Messreihe)" Style="{StaticResource FieldLabel}" />
+                                    <ComboBox x:Name="LiveTransponderBox" SelectionChanged="LiveTransponderBox_SelectionChanged" />
+                                </StackPanel>
+                            </Grid>
+                            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button x:Name="LiveStartButton" Content="▶  Live starten" Click="LiveStartButton_Click" IsEnabled="False"
+                                            Style="{StaticResource AccentButton}" MinWidth="120" Margin="8,0,8,0" />
+                                    <Button x:Name="LiveStopButton" Content="■  Stopp" Click="LiveStopButton_Click" IsEnabled="False"
+                                            MinWidth="80" Margin="0,0,8,0" />
+                                    <Button x:Name="MiniScanButton" Content="◔  Mini-Scan Ebene" Click="MiniScanButton_Click" IsEnabled="False" Margin="0,0,8,0"
+                                            ToolTip="Misst bis zu 5 gleichmäßig über die Ebene verteilte Transponder und zeigt Minimum und Maximum als violetten Bogen in den Gauges" />
+                                    <Button Content="Marken zurücksetzen" Click="ResetPeaksButton_Click" Margin="0,0,8,0"
+                                            ToolTip="Blaue Marke = bester Wert seit dem Start (hilfreich beim Ausrichten), violetter Bogen = Bereich des Mini-Scans" />
+                                    <Button x:Name="FullscreenButton" Content="⛶  Vollbild" Click="FullscreenButton_Click"
+                                            ToolTip="Live-Messung im Vollbild anzeigen (F11) – Esc kehrt zurück" />
+                                </StackPanel>
+                                <Border x:Name="LiveLockBadge" CornerRadius="12" Padding="12,3" Background="#B0B0B0" VerticalAlignment="Center">
+                                    <TextBlock x:Name="LiveLockText" Text="bereit" Foreground="White" FontWeight="SemiBold" />
+                                </Border>
+                                <TextBlock x:Name="LiveInfoText" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="10,0,0,0"
+                                           TextTrimming="CharacterEllipsis" />
+                            </DockPanel>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*" />
+                                    <RowDefinition Height="2*" />
+                                    <RowDefinition Height="1.3*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource Card}" Margin="0,0,6,6" Padding="6"><c:GaugeControl x:Name="GaugeMer" /></Border>
+                                <Border Grid.Column="1" Style="{StaticResource Card}" Margin="3,0,3,6" Padding="6"><c:GaugeControl x:Name="GaugeCn" /></Border>
+                                <Border Grid.Column="2" Style="{StaticResource Card}" Margin="6,0,0,6" Padding="6"><c:GaugeControl x:Name="GaugeLevel" /></Border>
+                                <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,6,6" Padding="6"><c:GaugeControl x:Name="GaugeQuality" /></Border>
+                                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Margin="3,0,3,6" Padding="6"><c:GaugeControl x:Name="GaugeStrength" /></Border>
+                                <Border Grid.Row="1" Grid.Column="2" Style="{StaticResource Card}" Margin="6,0,0,6" Padding="6"><c:GaugeControl x:Name="GaugeBer" /></Border>
+                                <c:TrafficLight x:Name="LiveLight" Grid.Row="2" Margin="0,0,6,0" VisibleReasons="3" Compact="True" VerticalAlignment="Top" />
+                                <sp:WpfPlot x:Name="PlotLive" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" />
+                            </Grid>
+                        </DockPanel>
                     </TabItem>
                 </TabControl>
             </Border>
