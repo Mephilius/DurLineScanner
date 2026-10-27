@@ -1,0 +1,17 @@
+# Build
+bin/
+obj/
+artifacts/
+publish/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+TestResults/
+
+# Lokale Analysedaten – nicht veröffentlichen
+analysis/
+
+# Installer-Ausgabe
+installer/Output/

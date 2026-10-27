@@ -1,0 +1,152 @@
+<Window x:Class="DurLineScanner.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Einstellungen" Height="640" Width="900" MinWidth="760" MinHeight="560"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Closing="Window_Closing"
+        Background="{StaticResource AppBackground}" FontFamily="Segoe UI" FontSize="13" Icon="/Assets/app.ico">
+    <DockPanel Margin="12">
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+            <Button DockPanel.Dock="Right" Content="Fertig" Click="CloseButton_Click" IsDefault="True"
+                    Style="{StaticResource AccentButton}" MinWidth="110" />
+            <TextBlock Style="{StaticResource Hint}" VerticalAlignment="Center"
+                       Text="Änderungen werden beim Schließen gespeichert." />
+        </DockPanel>
+
+        <Border Style="{StaticResource Card}" Padding="6">
+            <TabControl x:Name="Tabs" BorderThickness="0" Background="Transparent">
+                <TabItem x:Name="SitesTab" Header="Standorte">
+                    <Grid Margin="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="230" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <DockPanel>
+                            <UniformGrid DockPanel.Dock="Bottom" Columns="2" Margin="0,8,0,0">
+                                <Button Content="+  Neu" Click="NewSiteButton_Click" Margin="0,0,4,0" />
+                                <Button x:Name="DeleteSiteButton" Content="Löschen" Click="DeleteSiteButton_Click" Margin="4,0,0,0" />
+                            </UniformGrid>
+                            <ListBox x:Name="SiteList" SelectionChanged="SiteList_SelectionChanged" />
+                        </DockPanel>
+
+                        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                            <StackPanel x:Name="SiteForm">
+                                <TextBlock Text="Name des Standorts" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="SiteNameBox" TextChanged="SiteField_Changed" Margin="0,0,0,10"
+                                         ToolTip="z.B. „Zuhause“, „Ferienhaus“ oder „Kunde Müller“" />
+
+                                <TextBlock Text="Adresse" Style="{StaticResource FieldLabel}" />
+                                <DockPanel Margin="0,0,0,4">
+                                    <Button x:Name="GeocodeButton" DockPanel.Dock="Right" Content="📍  Koordinaten ermitteln"
+                                            Click="GeocodeButton_Click" Margin="8,0,0,0"
+                                            ToolTip="Sucht die Adresse bei OpenStreetMap (Nominatim) – geschieht auch automatisch beim Verlassen des Felds" />
+                                    <TextBox x:Name="SiteAddressBox" TextChanged="SiteField_Changed" LostFocus="SiteAddressBox_LostFocus"
+                                             ToolTip="Straße, Hausnummer, PLZ und Ort" />
+                                </DockPanel>
+                                <TextBlock x:Name="GeocodeText" Style="{StaticResource Hint}" Margin="0,0,0,8" />
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Breite (° Nord)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="SiteLatBox" TextChanged="SiteField_Changed" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Länge (° Ost)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="SiteLonBox" TextChanged="SiteField_Changed" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Größe der Schüssel (cm)" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteDishBox" IsEditable="True" TextBoxBase.TextChanged="SiteField_Changed"
+                                                  ToolTip="Durchmesser bzw. bei Offset-Schüsseln die Breite" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Verstärkung des LNB (dB)" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="SiteGainBox" TextChanged="SiteField_Changed"
+                                                 ToolTip="Konversionsgewinn laut Datenblatt, typisch 50–65 dB" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border Background="#F7F9FC" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                                        CornerRadius="6" Padding="12,10">
+                                    <StackPanel>
+                                        <TextBlock x:Name="LookTitle" FontWeight="SemiBold" Margin="0,0,0,4" />
+                                        <TextBlock x:Name="LookText" Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </TabItem>
+
+                <TabItem x:Name="GeneralTab" Header="Allgemein">
+                    <StackPanel Margin="8" MaxWidth="620" HorizontalAlignment="Left">
+                        <TextBlock Text="Sprache / Language" Style="{StaticResource FieldLabel}" />
+                        <ComboBox x:Name="LanguageBox" SelectionChanged="LanguageBox_SelectionChanged" Margin="0,0,0,6" MinWidth="260">
+                            <ComboBoxItem Content="Wie Windows / Same as Windows" />
+                            <ComboBoxItem Content="Deutsch" />
+                            <ComboBoxItem Content="English" />
+                        </ComboBox>
+                        <TextBlock x:Name="LanguageHint" Style="{StaticResource Hint}"
+                                   Text="Die neue Sprache gilt nach einem Neustart der App. / The new language applies after restarting the app." />
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem x:Name="ReceiverTab" Header="Receiver / Senderliste">
+                    <StackPanel Margin="8" MaxWidth="620" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource Hint}" Margin="0,0,0,12"
+                                   Text="Die Senderliste (welche Programme auf welchem Transponder liegen) kann direkt vom eigenen Receiver geladen werden. Enigma2: über OpenWebif, notfalls per FTP (Benutzer root). TVHeadend: über die Web-API (Port 9981, Benutzer mit Admin-Recht)." />
+
+                        <TextBlock Text="Receiver" Style="{StaticResource FieldLabel}" />
+                        <ComboBox x:Name="ReceiverKindBox" SelectedIndex="0" Margin="0,0,0,10" SelectionChanged="ReceiverKindBox_SelectionChanged">
+                            <ComboBoxItem Content="kein Receiver" />
+                            <ComboBoxItem Content="Enigma2 (Dreambox, VU+, Gigablue, Octagon … mit OpenWebif)" />
+                            <ComboBoxItem Content="TVHeadend" />
+                        </ComboBox>
+
+                        <TextBlock Text="Adresse" Style="{StaticResource FieldLabel}" />
+                        <TextBox x:Name="ReceiverAddressBox" Margin="0,0,0,2" />
+                        <TextBlock x:Name="ReceiverAddressHint" Style="{StaticResource Hint}" Margin="0,0,0,10" />
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Benutzer (optional)" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="ReceiverUserBox" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Passwort (optional)" Style="{StaticResource FieldLabel}" />
+                                <PasswordBox x:Name="ReceiverPasswordBox" ToolTip="Wird verschlüsselt für Ihr Windows-Konto gespeichert" />
+                            </StackPanel>
+                        </Grid>
+
+                        <CheckBox x:Name="LoadOnStartBox" Content="Senderliste bei jedem Programmstart aktualisieren" Margin="0,0,0,14" />
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="ReceiverLoadButton" Content="⟳  Verbindung testen und Senderliste laden"
+                                    Click="ReceiverLoadButton_Click" Style="{StaticResource AccentButton}" />
+                        </StackPanel>
+                        <TextBlock x:Name="ReceiverStatusText" Style="{StaticResource Hint}" Margin="0,10,0,0" />
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </Border>
+    </DockPanel>
+</Window>
