@@ -63,8 +63,9 @@ public static partial class L
                 case Window w:
                     w.Title = T(w.Title);
                     break;
-                case TextBlock tb when !tb.IsBindingSet(TextBlock.TextProperty):
-                    tb.Text = T(tb.Text);
+                // Nur bei vorhandener Übersetzung setzen – sonst gingen Hyperlinks im TextBlock verloren
+                case TextBlock tb when !tb.IsBindingSet(TextBlock.TextProperty) && T(tb.Text) is var t && t != tb.Text:
+                    tb.Text = t;
                     break;
                 case HeaderedContentControl { Header: string header } hc:
                     hc.Header = T(header);

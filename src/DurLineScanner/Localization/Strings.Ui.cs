@@ -9,6 +9,32 @@ public static partial class L
         d["⚙  Einstellungen"] = "⚙  Settings";
         d["Standorte verwalten, Receiver für die Senderliste eintragen"] = "Manage sites, set up the receiver for the channel list";
         d["Sat-Messung mit dem SF 4000 BT"] = "Satellite measurement with the SF 4000 BT";
+        d["Entwicklungsversion"] = "development build";
+
+        // Hilfe
+        d["?  Hilfe"] = "?  Help";
+        d["Benutzerhandbuch, Version und Lizenz (F1)"] = "User guide, version and license (F1)";
+        d["Hilfe"] = "Help";
+        d["Schließen"] = "Close";
+        d["Benutzerhandbuch"] = "User guide";
+        d["Suchen: Strg+F · Zoom: Strg+Mausrad · Inhaltsverzeichnis anklicken springt zum Abschnitt"] =
+            "Search: Ctrl+F · Zoom: Ctrl+mouse wheel · click the table of contents to jump to a section";
+        d["Über"] = "About";
+        d["Lizenz"] = "License";
+        d["Windows-Programm für das Sat-Messgerät DUR-line SF 4000 BT: Transponder-Scans, Messreihen, Pegelauswertung je Ebene, Live-Messung mit Ampel."] =
+            "Windows app for the DUR-line SF 4000 BT satellite meter: transponder scans, measurement series, level analysis per plane, live measurement with traffic light.";
+        d["Getestet nur mit einem Gerät: DUR-line SF 4000 BT („Finder S2“, Modell 260B)."] =
+            "Tested with one device only: DUR-line SF 4000 BT (“Finder S2”, model 260B).";
+        d["Kein Produkt des Geräteherstellers. Markennamen gehören ihren Inhabern."] =
+            "Not a product of the device manufacturer. Trademarks belong to their owners.";
+        d["Freie Software unter der GNU General Public License Version 3 (GPL-3.0): Sie dürfen das Programm nutzen, weitergeben und verändern; veränderte Fassungen müssen ebenfalls unter der GPL-3.0 mit Quelltext weitergegeben werden. Es gibt keinerlei Gewährleistung. Den vollständigen Text zeigt die Registerkarte „Lizenz“."] =
+            "Free software under the GNU General Public License version 3 (GPL-3.0): you may use, share and modify the program; modified versions must also be distributed under the GPL-3.0 with source code. There is no warranty whatsoever. The full text is shown on the “License” tab.";
+        d["Quelltext und Versionen"] = "Source code and releases";
+        d["Daten und Bibliotheken von Dritten"] = "Third-party data and libraries";
+        d["• Transponderliste: satellites.xml von OpenPLi (aus LyngSat-Daten erzeugt)"] = "• Transponder list: satellites.xml from OpenPLi (generated from LyngSat data)";
+        d["• Adresssuche: Nominatim – Kartendaten © OpenStreetMap-Mitwirkende (ODbL)"] = "• Address search: Nominatim – map data © OpenStreetMap contributors (ODbL)";
+        d["• Diagramme: ScottPlot (MIT-Lizenz)"] = "• Charts: ScottPlot (MIT license)";
+        d["• Laufzeit: .NET und WPF von Microsoft (MIT-Lizenz)"] = "• Runtime: .NET and WPF by Microsoft (MIT license)";
         d["nicht verbunden"] = "not connected";
         d["Verbinden"] = "Connect";
         d["Trennen"] = "Disconnect";

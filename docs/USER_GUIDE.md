@@ -80,6 +80,13 @@ If the device is not found: see [Troubleshooting](#18-troubleshooting).
 The program starts in the language of Windows (German on a German Windows, otherwise English). Under
 **⚙ Settings → General** the language can be set permanently; it takes effect after a restart.
 
+### Help
+
+**? Help** at the top right (or **F1**) opens this guide inside the program, plus **About** with version number,
+license and sources, and the full **license text**. In the guide, **Ctrl+F** searches; clicking the table of
+contents jumps to the section. The help window can stay open while you work. The version number is also shown at
+the top next to the program name.
+
 ## 4. Settings
 
 **⚙ Settings** at the top right opens a window with three tabs. Changes are saved when you close it

@@ -9,6 +9,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>DUR-line Scanner</AssemblyTitle>
+    <!-- Lokale Builds; der Release-Workflow setzt die Version aus dem Tag (-p:Version=…) -->
+    <Version>0.0.0-dev</Version>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <!-- Fluent-Theme (Application.ThemeMode) ist in .NET noch als experimentell markiert -->
     <NoWarn>$(NoWarn);WPF0001</NoWarn>
@@ -21,6 +23,13 @@
   <ItemGroup>
     <!-- Programmsymbol: Sat-Schüssel mit Signalbögen in Ampelfarben -->
     <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Hilfe: Handbücher und Lizenz sind ins Programm eingebettet und passen so immer zur Version -->
+    <EmbeddedResource Include="..\..\docs\BENUTZERHANDBUCH.md" LogicalName="Help.BENUTZERHANDBUCH.md" />
+    <EmbeddedResource Include="..\..\docs\USER_GUIDE.md" LogicalName="Help.USER_GUIDE.md" />
+    <EmbeddedResource Include="..\..\LICENSE" LogicalName="Help.LICENSE" />
   </ItemGroup>
 
   <ItemGroup>

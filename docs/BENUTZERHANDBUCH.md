@@ -80,6 +80,13 @@ Wird das Gerät nicht gefunden: siehe [Fehlerbehebung](#18-fehlerbehebung).
 Das Programm startet in der Sprache von Windows (Deutsch bei deutschem Windows, sonst Englisch). Unter
 **⚙ Einstellungen → Allgemein** lässt sich die Sprache fest einstellen; sie gilt nach einem Neustart.
 
+### Hilfe
+
+**? Hilfe** oben rechts (oder **F1**) öffnet dieses Handbuch im Programm, dazu **Über** mit Versionsnummer,
+Lizenz und Quellen sowie den vollständigen **Lizenztext**. Im Handbuch sucht **Strg+F**; ein Klick im
+Inhaltsverzeichnis springt zum Abschnitt. Das Hilfefenster kann neben der Arbeit offen bleiben. Die Versionsnummer
+steht auch oben neben dem Programmnamen.
+
 ## 4. Einstellungen
 
 **⚙ Einstellungen** oben rechts öffnet ein Fenster mit drei Registerkarten. Änderungen werden beim Schließen

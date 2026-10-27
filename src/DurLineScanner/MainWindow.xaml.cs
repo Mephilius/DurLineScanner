@@ -60,6 +60,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         L.Translate(this);
+        VersionText.Text = VersionLabel();
 
         SessionList.ItemsSource = _sessions;
         ResultGrid.ItemsSource = _results;
@@ -92,6 +93,16 @@ public partial class MainWindow : Window
             if (_database.Catalog is null) await DownloadTransponderListAsync();
             if (_settings.LoadChannelsOnStart && _settings.ReceiverConfigured) await LoadChannelsFromReceiverAsync();
         };
+    }
+
+    /// <summary>"v0.9.2" aus der beim Release gesetzten Version; lokale Builds (0.0.0-dev) als Entwicklungsversion.</summary>
+    private static string VersionLabel()
+    {
+        var info = System.Reflection.Assembly.GetExecutingAssembly()
+            .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+            .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion ?? "";
+        var version = info.Split('+')[0]; // Commit-Kennung abschneiden
+        return version.Length == 0 || version.EndsWith("-dev") ? L.T("Entwicklungsversion") : "v" + version;
     }
 
     private Satellite? SelectedSatellite => SatelliteBox.SelectedItem as Satellite;
@@ -195,6 +206,23 @@ public partial class MainWindow : Window
     // ---------------------------------------------------------------- Einstellungen, Standort und Wetter
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e) => OpenSettings(showReceiver: false);
+
+    private void HelpButton_Click(object sender, RoutedEventArgs e) => OpenHelp();
+
+    private HelpWindow? _help;
+
+    /// <summary>Hilfe nicht modal, damit man beim Lesen weiterarbeiten kann; nur ein Fenster gleichzeitig.</summary>
+    private void OpenHelp()
+    {
+        if (_help is not null)
+        {
+            _help.Activate();
+            return;
+        }
+        _help = new HelpWindow(VersionLabel()) { Owner = this };
+        _help.Closed += (_, _) => _help = null;
+        _help.Show();
+    }
 
     private void ManageSitesButton_Click(object sender, RoutedEventArgs e) => OpenSettings(showReceiver: false);
 
@@ -883,6 +911,11 @@ public partial class MainWindow : Window
         if (e.Key == System.Windows.Input.Key.F11 && LiveTab.IsSelected)
         {
             ToggleFullscreen();
+            e.Handled = true;
+        }
+        else if (e.Key == System.Windows.Input.Key.F1)
+        {
+            OpenHelp();
             e.Handled = true;
         }
     }
