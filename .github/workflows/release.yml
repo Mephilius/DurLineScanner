@@ -75,6 +75,8 @@ jobs:
         with:
           name: DurLine Scanner ${{ steps.version.outputs.version }}
           generate_release_notes: true
+          # Versionen unter 1.0 und Tags mit Zusatz (z.B. v1.1.0-beta) als Vorabversion
+          prerelease: ${{ startsWith(steps.version.outputs.version, '0.') || contains(steps.version.outputs.version, '-') }}
           files: |
             publish/*.exe
             publish/*.zip
