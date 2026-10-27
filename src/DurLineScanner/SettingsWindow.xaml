@@ -117,8 +117,27 @@
                             <ComboBoxItem Content="TVHeadend" />
                         </ComboBox>
 
-                        <TextBlock Text="Adresse" Style="{StaticResource FieldLabel}" />
-                        <TextBox x:Name="ReceiverAddressBox" Margin="0,0,0,2" />
+                        <Grid Margin="0,0,0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="Adresse (Name oder IP)" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="ReceiverAddressBox" LostFocus="ReceiverAddressBox_LostFocus" TextChanged="ReceiverConnection_Changed" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Port" Style="{StaticResource FieldLabel}" />
+                                <TextBox x:Name="ReceiverPortBox" TextChanged="ReceiverConnection_Changed"
+                                         ToolTip="Leer lassen für den Standard-Port" />
+                            </StackPanel>
+                            <CheckBox x:Name="ReceiverHttpsBox" Grid.Column="4" Content="Verschlüsselt (HTTPS)" VerticalAlignment="Bottom"
+                                      Margin="0,0,0,6" Checked="ReceiverConnection_Changed" Unchecked="ReceiverConnection_Changed"
+                                      ToolTip="Für einen Receiver hinter einem Reverse-Proxy mit Zertifikat, z.B. https://tv.example.de" />
+                        </Grid>
                         <TextBlock x:Name="ReceiverAddressHint" Style="{StaticResource Hint}" Margin="0,0,0,10" />
 
                         <Grid Margin="0,0,0,10">

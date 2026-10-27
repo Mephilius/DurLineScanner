@@ -111,9 +111,29 @@ public class ChannelListTests
         Assert.Equal(expected, ReceiverChannelSource.ParseOrbital(text));
 
     [Theory]
-    [InlineData(ReceiverKind.Tvheadend, "192.168.1.30", "http://192.168.1.30:9981/")]
-    [InlineData(ReceiverKind.Tvheadend, "http://tvh:9982", "http://tvh:9982/")]
-    [InlineData(ReceiverKind.Enigma2, "vuplus.local", "http://vuplus.local/")]
-    public void BaseUri_AddsDefaults(ReceiverKind kind, string address, string expected) =>
-        Assert.Equal(expected, ReceiverChannelSource.BaseUri(new AppSettings { ReceiverKind = kind, ReceiverAddress = address }).ToString());
+    [InlineData(ReceiverKind.Tvheadend, "192.168.1.30", false, null, "http://192.168.1.30:9981/")]
+    [InlineData(ReceiverKind.Tvheadend, "tv.example.de", true, null, "https://tv.example.de/")]
+    [InlineData(ReceiverKind.Tvheadend, "tvh", false, 9982, "http://tvh:9982/")]
+    [InlineData(ReceiverKind.Tvheadend, "server/tvheadend", true, 8443, "https://server:8443/tvheadend/")]
+    [InlineData(ReceiverKind.Enigma2, "vuplus.local", false, null, "http://vuplus.local/")]
+    [InlineData(ReceiverKind.Enigma2, "box.example.de", true, null, "https://box.example.de/")]
+    [InlineData(ReceiverKind.Enigma2, "192.168.1.20", false, 8080, "http://192.168.1.20:8080/")]
+    public void BaseUri_FromFields(ReceiverKind kind, string address, bool https, int? port, string expected) =>
+        Assert.Equal(expected, ReceiverChannelSource.BaseUri(
+            new AppSettings { ReceiverKind = kind, ReceiverAddress = address, ReceiverHttps = https, ReceiverPort = port }).ToString());
+
+    [Theory]
+    [InlineData("https://tv.example.de", "tv.example.de", true, null)]
+    [InlineData("http://tvh:9982", "tvh", false, 9982)]
+    [InlineData("tvh.local:9982", "tvh.local", false, 9982)]
+    [InlineData("https://server:8443/tvheadend/", "server/tvheadend", true, 8443)]
+    [InlineData("192.168.1.20", "192.168.1.20", false, null)]
+    public void SplitReceiverAddress_FullAddressToFields(string input, string address, bool https, int? port)
+    {
+        var s = new AppSettings { ReceiverKind = ReceiverKind.Tvheadend, ReceiverAddress = input };
+        s.SplitReceiverAddress();
+        Assert.Equal(address, s.ReceiverAddress);
+        Assert.Equal(https, s.ReceiverHttps);
+        Assert.Equal(port, s.ReceiverPort);
+    }
 }

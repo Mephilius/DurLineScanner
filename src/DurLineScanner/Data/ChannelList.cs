@@ -37,7 +37,8 @@ public sealed record ChannelOnTransponder(Channel Channel, int FrequencyMHz, Pol
 /// </summary>
 public sealed class ChannelList
 {
-    public static readonly string UserCopyPath = Path.Combine(
+    /// <summary>Gespeicherte Senderliste; in Tests auf eine temporäre Datei umstellbar.</summary>
+    public static string UserCopyPath { get; internal set; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DurLineScanner", "lamedb");
 
     /// <summary>Aktuell geladene Liste (für Tooltips in der Tabelle).</summary>
@@ -60,6 +61,7 @@ public sealed class ChannelList
         _transponders
             .Where(t => t.Pol == pol && Math.Abs(t.FrequencyMHz - frequencyMHz) <= 2 && Math.Abs(t.Position - positionTenths) <= 2)
             .SelectMany(t => t.Channels)
+            .Where(c => c.Name.Any(char.IsLetterOrDigit))
             .DistinctBy(c => (c.Name, c.Kind))
             .ToList();
 
@@ -68,7 +70,7 @@ public sealed class ChannelList
         _transponders
             .Where(t => Math.Abs(t.Position - positionTenths) <= 2)
             .SelectMany(t => t.Channels.Select(c => new ChannelOnTransponder(c, t.FrequencyMHz, t.Pol)))
-            .Where(c => c.Channel.Kind != ChannelKind.Data && c.Channel.Name.Length > 0)
+            .Where(c => c.Channel.Kind != ChannelKind.Data && c.Channel.Name.Any(char.IsLetterOrDigit))
             .DistinctBy(c => (c.Channel.Name, c.FrequencyMHz, c.Pol))
             .OrderBy(c => c.Channel.Name, StringComparer.CurrentCultureIgnoreCase)
             .ToList();

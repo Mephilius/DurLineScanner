@@ -116,10 +116,22 @@ site data (they contain a copy).
 
 The program can load directly from your own receiver which channels are on which transponder.
 
-| Receiver | Address | Access |
+| Receiver | Default port | Access |
 |---|---|---|
-| **Enigma2** (Dreambox, VU+, Gigablue, Octagon … with OpenWebif) | IP or name, e.g. `192.168.1.20` | User/password of the web interface, if set. If OpenWebif blocks file access, FTP is tried (user `root`) |
-| **TVHeadend** | IP or name; port 9981 is added, or enter the full `http://server:9981` | User with admin rights |
+| **Enigma2** (Dreambox, VU+, Gigablue, Octagon … with OpenWebif) | 80 | User/password of the web interface, if set. If OpenWebif blocks file access, FTP is tried (user `root`) |
+| **TVHeadend** | 9981 | User with admin rights, if access is protected |
+
+The connection is entered in three fields:
+
+- **Address (name or IP)** – without `http://`, e.g. `192.168.1.30`, `vuplus.local` or `tv.example.com`.
+  If the receiver sits behind a proxy in a sub-path, append it: `server.example.com/tvheadend`.
+- **Port** – leave empty for the default port (see table; 443 with HTTPS).
+- **Encrypted (HTTPS)** – tick if the receiver is reached via `https://`, e.g. behind a reverse proxy with a
+  certificate.
+
+Below, the window shows the resulting connection, e.g. `https://tv.example.com/`. If you paste a full address
+such as `https://tv.example.com:8443` into the address field, the program splits it into the three fields
+automatically.
 
 **⟳ Test connection and load channel list** checks the settings and loads the list immediately. With
 **Update channel list at every start** the list stays up to date automatically. The password is stored encrypted
@@ -375,7 +387,7 @@ Filter the list on the left by weather, or click **Tick same conditions** in **C
 | Many transponders without lock, level normal | probably an outdated transponder list: **⟳ Update transponder list** |
 | A whole plane is missing | Check the LNB, cable or multiswitch input of that plane; with a Quattro LNB at the port, select the correct plane |
 | "Address not found" | Check the spelling (e.g. "Hauptstraße 1, 12345 Town") or enter the coordinates by hand |
-| Channel list from the receiver does not load | Test the address in a browser (Enigma2: `http://<address>/`, TVHeadend: `http://<address>:9981/`); check user and password; TVHeadend requires admin rights |
+| Channel list from the receiver does not load | Open the connection shown below the address field in a browser. If it does not respond: check port and the HTTPS box (behind a proxy usually HTTPS without port). Check user and password; TVHeadend requires admin rights |
 | Channels are missing in the table | Load a channel list; it must contain the selected satellite |
 
 ## 19. Limits and notes

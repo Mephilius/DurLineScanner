@@ -241,7 +241,7 @@ public partial class MainWindow : Window
     private void UpdateReceiverButton()
     {
         ReceiverButton.ToolTip = _settings.ReceiverConfigured
-            ? L.F("Senderliste jetzt von {0} {1} laden", _settings.ReceiverKind, _settings.ReceiverAddress)
+            ? L.F("Senderliste jetzt von {0} {1} laden", _settings.ReceiverKind, ReceiverChannelSource.BaseUri(_settings))
             : L.T("Senderliste online vom Enigma2-Receiver oder TVHeadend laden – zuerst in den Einstellungen eintragen");
     }
 

@@ -116,10 +116,22 @@ behalten ihre Standortdaten (sie enthalten eine Kopie).
 
 Welche Programme auf welchem Transponder liegen, kann das Programm direkt vom eigenen Receiver laden.
 
-| Receiver | Adresse | Zugang |
+| Receiver | Standard-Port | Zugang |
 |---|---|---|
-| **Enigma2** (Dreambox, VU+, Gigablue, Octagon … mit OpenWebif) | IP oder Name, z.B. `192.168.1.20` | Benutzer/Passwort des Webinterfaces, falls gesetzt. Sperrt OpenWebif den Dateizugriff, wird FTP versucht (Benutzer `root`) |
-| **TVHeadend** | IP oder Name; Port 9981 wird ergänzt, oder vollständig `http://server:9981` | Benutzer mit Admin-Recht |
+| **Enigma2** (Dreambox, VU+, Gigablue, Octagon … mit OpenWebif) | 80 | Benutzer/Passwort des Webinterfaces, falls gesetzt. Sperrt OpenWebif den Dateizugriff, wird FTP versucht (Benutzer `root`) |
+| **TVHeadend** | 9981 | Benutzer mit Admin-Recht, falls der Zugriff geschützt ist |
+
+Die Verbindung wird in drei Feldern eingetragen:
+
+- **Adresse (Name oder IP)** – ohne `http://`, z.B. `192.168.1.30`, `vuplus.local` oder `tv.example.de`.
+  Liegt der Receiver hinter einem Proxy in einem Unterpfad, diesen anhängen: `server.example.de/tvheadend`.
+- **Port** – leer lassen für den Standard-Port (siehe Tabelle, mit HTTPS 443).
+- **Verschlüsselt (HTTPS)** – anhaken, wenn der Receiver über `https://` erreichbar ist, z.B. hinter einem
+  Reverse-Proxy mit Zertifikat.
+
+Darunter zeigt das Fenster die daraus gebildete Verbindung, z.B. `https://tv.example.de/`. Wird eine vollständige
+Adresse wie `https://tv.example.de:8443` ins Adressfeld eingefügt, verteilt das Programm sie automatisch auf die
+drei Felder.
 
 **⟳ Verbindung testen und Senderliste laden** prüft die Einstellungen und lädt die Liste sofort. Mit
 **Senderliste bei jedem Programmstart aktualisieren** bleibt die Liste automatisch aktuell. Das Passwort wird
@@ -376,7 +388,7 @@ Linke Liste nach Wetter filtern oder in **Vergleich** auf **Gleiche Bedingungen 
 | Viele Transponder ohne Lock, Pegel normal | wahrscheinlich veraltete Transponderliste: **⟳ Transponderliste aktualisieren** |
 | Eine ganze Ebene fehlt | LNB, Kabel oder Multischalter-Eingang dieser Ebene prüfen; bei Quattro-LNB am Port die richtige Ebene wählen |
 | „Adresse nicht gefunden“ | Schreibweise prüfen (z.B. „Hauptstraße 1, 12345 Ort“) oder Koordinaten von Hand eintragen |
-| Senderliste vom Receiver lädt nicht | Adresse im Browser testen (Enigma2: `http://<adresse>/`, TVHeadend: `http://<adresse>:9981/`); Benutzer und Passwort prüfen; bei TVHeadend Admin-Recht nötig |
+| Senderliste vom Receiver lädt nicht | Die unter dem Adressfeld angezeigte Verbindung im Browser öffnen. Antwortet sie nicht: Port und HTTPS-Haken prüfen (hinter einem Proxy meist HTTPS ohne Port). Benutzer und Passwort prüfen; bei TVHeadend Admin-Recht nötig |
 | Programme in der Tabelle fehlen | Senderliste laden; sie muss den gewählten Satelliten enthalten |
 
 ## 19. Grenzen und Hinweise

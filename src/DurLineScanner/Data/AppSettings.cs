@@ -33,8 +33,33 @@ public sealed class AppSettings
 
     public ReceiverKind ReceiverKind { get; set; }
 
-    /// <summary>Adresse wie "192.168.1.20", "vuplus.local" oder "http://server:9981".</summary>
+    /// <summary>Name oder IP des Receivers, z.B. "192.168.1.20" oder "tv.example.de", optional mit Pfad ("server/tvheadend").</summary>
     public string ReceiverAddress { get; set; } = "";
+
+    /// <summary>Port; null = Standard (TVHeadend 9981, Enigma2 80, mit HTTPS 443).</summary>
+    public int? ReceiverPort { get; set; }
+
+    /// <summary>Verschlüsselte Verbindung (HTTPS), z.B. hinter einem Reverse-Proxy.</summary>
+    public bool ReceiverHttps { get; set; }
+
+    [JsonIgnore]
+    public int ReceiverDefaultPort => ReceiverHttps ? 443 : ReceiverKind == ReceiverKind.Tvheadend ? 9981 : 80;
+
+    /// <summary>
+    /// Zerlegt eine vollständig eingegebene Adresse wie "https://server:8443/tvh" in Adresse, Port und HTTPS.
+    /// Auch für ältere Einstellungen, in denen alles im Adressfeld stand.
+    /// </summary>
+    public void SplitReceiverAddress()
+    {
+        var text = ReceiverAddress.Trim().TrimEnd('/');
+        if (text.Length == 0) return;
+        bool hasScheme = text.Contains("://");
+        if (!Uri.TryCreate(hasScheme ? text : "http://" + text, UriKind.Absolute, out var uri)) return;
+        if (hasScheme) ReceiverHttps = uri.Scheme == Uri.UriSchemeHttps;
+        // Port nur übernehmen, wenn er ausdrücklich angegeben war
+        if (!uri.IsDefaultPort || text.Contains($":{uri.Port}")) ReceiverPort = uri.Port;
+        ReceiverAddress = uri.Host + uri.AbsolutePath.TrimEnd('/');
+    }
 
     public string ReceiverUser { get; set; } = "";
 
@@ -75,7 +100,9 @@ public sealed class AppSettings
     {
         try
         {
-            return File.Exists(Path) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(Path), JsonOptions) ?? new() : new();
+            var settings = File.Exists(Path) ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(Path), JsonOptions) ?? new() : new();
+            settings.SplitReceiverAddress();
+            return settings;
         }
         catch (JsonException)
         {

@@ -23,15 +23,15 @@ public static partial class ReceiverChannelSource
 
     public static Uri BaseUri(AppSettings settings)
     {
-        var address = settings.ReceiverAddress.Trim().TrimEnd('/');
-        if (!address.Contains("://")) address = "http://" + address;
-        var uri = new UriBuilder(address);
-        // TVHeadend lauscht standardmäßig auf 9981, OpenWebif auf 80
-        if (settings.ReceiverKind == ReceiverKind.Tvheadend && !HasExplicitPort(address)) uri.Port = 9981;
-        if (!uri.Path.EndsWith('/')) uri.Path += "/";
+        // Schema und Port kommen aus eigenen Feldern; die Adresse ist nur Name/IP, optional mit Pfad
+        var address = settings.ReceiverAddress.Trim().Trim('/');
+        int slash = address.IndexOf('/');
+        var uri = new UriBuilder(
+            settings.ReceiverHttps ? Uri.UriSchemeHttps : Uri.UriSchemeHttp,
+            slash < 0 ? address : address[..slash],
+            settings.ReceiverPort ?? settings.ReceiverDefaultPort,
+            slash < 0 ? "/" : address[slash..] + "/");
         return uri.Uri;
-
-        static bool HasExplicitPort(string a) => PortRegex().IsMatch(a);
     }
 
     private static HttpClient CreateClient(AppSettings settings, Uri baseUri)
@@ -199,7 +199,4 @@ public static partial class ReceiverChannelSource
 
     [GeneratedRegex(@"(\d{1,3}(?:[.,]\d)?)\s*°?\s*(E|O|W|Ost|West)\b", RegexOptions.IgnoreCase)]
     private static partial Regex OrbitalRegex();
-
-    [GeneratedRegex(@"^[a-z]+://[^/]+:\d+|^[^/:]+:\d+", RegexOptions.IgnoreCase)]
-    private static partial Regex PortRegex();
 }

@@ -32,6 +32,8 @@ public partial class SettingsWindow : Window
 
         ReceiverKindBox.SelectedIndex = (int)settings.ReceiverKind;
         ReceiverAddressBox.Text = settings.ReceiverAddress;
+        ReceiverPortBox.Text = settings.ReceiverPort?.ToString() ?? "";
+        ReceiverHttpsBox.IsChecked = settings.ReceiverHttps;
         ReceiverUserBox.Text = settings.ReceiverUser;
         ReceiverPasswordBox.Password = settings.ReceiverPassword;
         LoadOnStartBox.IsChecked = settings.LoadChannelsOnStart;
@@ -215,24 +217,57 @@ public partial class SettingsWindow : Window
         if (IsInitialized) LanguageHint.Visibility = Visibility.Visible;
     }
 
+    private void ReceiverConnection_Changed(object sender, RoutedEventArgs e) => UpdateReceiverHint();
+
+    /// <summary>Vollständig eingefügte Adresse wie "https://server:8443" auf Adresse, Port und HTTPS verteilen.</summary>
+    private void ReceiverAddressBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        var text = ReceiverAddressBox.Text.Trim();
+        if (!text.Contains("://") && !text.Contains(':')) return;
+        var split = new AppSettings { ReceiverAddress = text, ReceiverHttps = ReceiverHttpsBox.IsChecked == true, ReceiverPort = ParsePort() };
+        split.SplitReceiverAddress();
+        ReceiverAddressBox.Text = split.ReceiverAddress;
+        ReceiverPortBox.Text = split.ReceiverPort?.ToString() ?? "";
+        ReceiverHttpsBox.IsChecked = split.ReceiverHttps;
+        UpdateReceiverHint();
+    }
+
+    private int? ParsePort() =>
+        int.TryParse(ReceiverPortBox.Text.Trim(), out int port) && port is > 0 and < 65536 ? port : null;
+
     private void UpdateReceiverHint()
     {
         if (!IsInitialized) return;
-        ReceiverAddressHint.Text = (ReceiverKind)ReceiverKindBox.SelectedIndex switch
-        {
-            ReceiverKind.Enigma2 => L.T("IP-Adresse oder Name, z.B. 192.168.1.20 oder vuplus.local (OpenWebif, Port 80)"),
-            ReceiverKind.Tvheadend => L.T("IP-Adresse oder Name, z.B. 192.168.1.30 – Port 9981 wird ergänzt, oder vollständig http://server:9981"),
-            _ => "",
-        };
-        bool active = ReceiverKindBox.SelectedIndex > 0;
-        ReceiverAddressBox.IsEnabled = ReceiverUserBox.IsEnabled = ReceiverPasswordBox.IsEnabled = active;
+        var kind = (ReceiverKind)ReceiverKindBox.SelectedIndex;
+        bool active = kind != ReceiverKind.None;
+        ReceiverAddressBox.IsEnabled = ReceiverPortBox.IsEnabled = ReceiverHttpsBox.IsEnabled = active;
+        ReceiverUserBox.IsEnabled = ReceiverPasswordBox.IsEnabled = active;
         ReceiverLoadButton.IsEnabled = LoadOnStartBox.IsEnabled = active;
+        if (!active)
+        {
+            ReceiverAddressHint.Text = "";
+            return;
+        }
+
+        var preview = new AppSettings
+        {
+            ReceiverKind = kind,
+            ReceiverAddress = ReceiverAddressBox.Text.Trim(),
+            ReceiverPort = ParsePort(),
+            ReceiverHttps = ReceiverHttpsBox.IsChecked == true,
+        };
+        var example = kind == ReceiverKind.Enigma2 ? L.T("z.B. 192.168.1.20 oder vuplus.local") : L.T("z.B. 192.168.1.30 oder tv.example.de");
+        ReceiverAddressHint.Text = L.F("Name oder IP ohne http:// ({0}). Port leer = Standard {1}.", example, preview.ReceiverDefaultPort)
+                                   + (preview.ReceiverAddress.Length > 0 ? "  " + L.F("Verbindung: {0}", ReceiverChannelSource.BaseUri(preview)) : "");
     }
 
     private void ApplyReceiverFields()
     {
         _settings.ReceiverKind = (ReceiverKind)ReceiverKindBox.SelectedIndex;
         _settings.ReceiverAddress = ReceiverAddressBox.Text.Trim();
+        _settings.ReceiverPort = ParsePort();
+        _settings.ReceiverHttps = ReceiverHttpsBox.IsChecked == true;
+        _settings.SplitReceiverAddress();
         _settings.ReceiverUser = ReceiverUserBox.Text.Trim();
         _settings.ReceiverPassword = ReceiverPasswordBox.Password;
         _settings.LoadChannelsOnStart = LoadOnStartBox.IsChecked == true;

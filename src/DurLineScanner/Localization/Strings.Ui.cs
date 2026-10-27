@@ -286,10 +286,15 @@ public static partial class L
             "Level at the LNB output approx. {0:0} dBµV (LNB {1:0.#} dB) – less at the outlet, depending on cable and distribution.";
         d["Richtwerte mit {0:0} dBW Sendeleistung (Mitteleuropa), Wirkungsgrad {1:P0}, Rauschtemperatur {2:0} K."] =
             "Guide values with {0:0} dBW transmit power (Central Europe), efficiency {1:P0}, noise temperature {2:0} K.";
-        d["IP-Adresse oder Name, z.B. 192.168.1.20 oder vuplus.local (OpenWebif, Port 80)"] =
-            "IP address or name, e.g. 192.168.1.20 or vuplus.local (OpenWebif, port 80)";
-        d["IP-Adresse oder Name, z.B. 192.168.1.30 – Port 9981 wird ergänzt, oder vollständig http://server:9981"] =
-            "IP address or name, e.g. 192.168.1.30 – port 9981 is added, or in full http://server:9981";
+        d["Adresse (Name oder IP)"] = "Address (name or IP)";
+        d["Leer lassen für den Standard-Port"] = "Leave empty for the default port";
+        d["Verschlüsselt (HTTPS)"] = "Encrypted (HTTPS)";
+        d["Für einen Receiver hinter einem Reverse-Proxy mit Zertifikat, z.B. https://tv.example.de"] =
+            "For a receiver behind a reverse proxy with a certificate, e.g. https://tv.example.com";
+        d["z.B. 192.168.1.20 oder vuplus.local"] = "e.g. 192.168.1.20 or vuplus.local";
+        d["z.B. 192.168.1.30 oder tv.example.de"] = "e.g. 192.168.1.30 or tv.example.com";
+        d["Name oder IP ohne http:// ({0}). Port leer = Standard {1}."] = "Name or IP without http:// ({0}). Empty port = default {1}.";
+        d["Verbindung: {0}"] = "Connection: {0}";
         d["Bitte die Adresse des Receivers eintragen."] = "Please enter the receiver's address.";
         d["Verbinde mit {0} …"] = "Connecting to {0} …";
         d["✓ Senderliste geladen: {0}"] = "✓ Channel list loaded: {0}";
