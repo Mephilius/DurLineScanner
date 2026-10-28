@@ -67,8 +67,11 @@ Startmenü und auf Wunsch eine Desktop-Verknüpfung an. Eine separate .NET-Insta
 
 1. Messgerät einschalten. Eine eventuell verbundene Handy-App trennen oder schließen – das Gerät kann nur mit
    einem Partner gleichzeitig verbunden sein.
-2. Im DUR-line Scanner oben rechts **Verbinden** klicken. Das Programm sucht nach einem Gerät namens „Finder …“.
-3. Fragt Windows nach einer **PIN**, `000001` eingeben.
+2. Oben rechts in der Geräteliste das Messgerät auswählen. Die Liste zeigt die in Windows gekoppelten und die gerade
+   sendenden Bluetooth-Geräte; das SF 4000 („Finder S2-…“) ist vorausgewählt. **⟳** sucht erneut, etwa wenn das
+   Gerät erst nach dem Programmstart eingeschaltet wurde.
+3. **Verbinden** klicken.
+4. Fragt Windows nach einer **PIN**, `000001` eingeben.
 
 Nach der ersten Verbindung merkt sich das Programm die Bluetooth-Adresse. Der grüne Punkt neben dem Gerätenamen
 zeigt eine bestehende Verbindung; **Trennen** beendet sie.

@@ -89,6 +89,7 @@ public partial class MainWindow : Window
         ShowFirstSessionOfSite(); // neueste Messreihe des Standorts anzeigen
         Loaded += async (_, _) =>
         {
+            _ = RefreshDevicesAsync();
             // Die Transponderliste wird nicht mitgeliefert – beim ersten Start herunterladen
             if (_database.Catalog is null) await DownloadTransponderListAsync();
             if (_settings.LoadChannelsOnStart && _settings.ReceiverConfigured) await LoadChannelsFromReceiverAsync();
@@ -125,10 +126,11 @@ public partial class MainWindow : Window
         }
 
         ConnectButton.IsEnabled = false;
+        DeviceBox.IsEnabled = RefreshDevicesButton.IsEnabled = false;
         ConnectionText.Text = L.T("verbinde …");
         try
         {
-            ulong? address = ReadSavedAddress();
+            ulong? address = (DeviceBox.SelectedItem as BleDeviceInfo)?.Address ?? ReadSavedAddress();
             if (address is null)
             {
                 SetStatus(L.T("Suche SF 4000 („Finder …“) …"));
@@ -147,7 +149,7 @@ public partial class MainWindow : Window
             {
                 await _client.ConnectAsync(address.Value);
             }
-            catch (InvalidOperationException) when (ReadSavedAddress() is not null)
+            catch (InvalidOperationException) when (DeviceBox.SelectedItem is null && ReadSavedAddress() is not null)
             {
                 // Gespeicherte Adresse passt nicht mehr – neu suchen
                 File.Delete(AddressFile);
@@ -170,11 +172,46 @@ public partial class MainWindow : Window
         finally
         {
             ConnectButton.IsEnabled = true;
+            DeviceBox.IsEnabled = RefreshDevicesButton.IsEnabled = !_client.IsConnected;
+        }
+    }
+
+    private async void RefreshDevicesButton_Click(object sender, RoutedEventArgs e) => await RefreshDevicesAsync();
+
+    /// <summary>Geräteliste neu füllen; vorausgewählt wird das SF 4000 („Finder …“), bevorzugt das zuletzt benutzte.</summary>
+    private async Task RefreshDevicesAsync()
+    {
+        RefreshDevicesButton.IsEnabled = false;
+        SetStatus(L.T("Suche Bluetooth-Geräte …"));
+        try
+        {
+            var previous = (DeviceBox.SelectedItem as BleDeviceInfo)?.Address;
+            var devices = await Sf4000Client.ListDevicesAsync(TimeSpan.FromSeconds(4));
+            var saved = ReadSavedAddress();
+            DeviceBox.ItemsSource = devices;
+            DeviceBox.SelectedItem =
+                devices.FirstOrDefault(d => d.Address == previous)
+                ?? devices.FirstOrDefault(d => d.IsFinder && d.Address == saved)
+                ?? devices.FirstOrDefault(d => d.IsFinder)
+                ?? devices.FirstOrDefault(d => d.Address == saved)
+                ?? devices.FirstOrDefault();
+            SetStatus(devices.Count == 0
+                ? L.T("Keine Bluetooth-Geräte gefunden. Gerät einschalten und Handy-App trennen.")
+                : L.F("{0} Bluetooth-Geräte gefunden.", devices.Count));
+        }
+        catch (Exception ex)
+        {
+            SetStatus(L.F("Gerätesuche fehlgeschlagen: {0}", ex.Message));
+        }
+        finally
+        {
+            RefreshDevicesButton.IsEnabled = !_client.IsConnected;
         }
     }
 
     private void UpdateConnectionUi(bool connected)
     {
+        DeviceBox.IsEnabled = RefreshDevicesButton.IsEnabled = !connected;
         ConnectionText.Text = connected ? L.F("{0} · Modell {1}", _client.DeviceName, _deviceModel) : L.T("nicht verbunden");
         ConnectionDot.Fill = connected ? (Brush)FindResource("GoodBrush") : Palette.Brush(MediaColor.FromRgb(0xB0, 0xB0, 0xB0));
         ConnectButton.Content = connected ? L.T("Trennen") : L.T("Verbinden");

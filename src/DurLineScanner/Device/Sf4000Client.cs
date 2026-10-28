@@ -3,9 +3,20 @@ using DurLineScanner.Data;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Devices.Enumeration;
 using Windows.Storage.Streams;
 
 namespace DurLineScanner.Device;
+
+/// <summary>Eintrag der Geräteauswahl.</summary>
+public sealed record BleDeviceInfo(ulong Address, string Name, bool Paired)
+{
+    public bool IsFinder => Name.StartsWith(Sf4000Client.DeviceNamePrefix, StringComparison.OrdinalIgnoreCase);
+
+    public string AddressText => string.Join(":", Enumerable.Range(0, 6).Select(i => ((Address >> (40 - 8 * i)) & 0xFF).ToString("X2")));
+
+    public string Label => Paired ? L.F("{0} ({1}, gekoppelt)", Name, AddressText) : $"{Name} ({AddressText})";
+}
 
 /// <summary>
 /// Bluetooth-LE-Verbindung zum SF 4000 BT ("Finder S2-…"), Lierda-UART-Brücke:
@@ -59,6 +70,49 @@ public sealed class Sf4000Client : IAsyncDisposable
         {
             watcher.Stop();
         }
+    }
+
+    /// <summary>
+    /// Bluetooth-LE-Geräte zur Auswahl: in Windows gekoppelte Geräte plus alle, die während
+    /// <paramref name="scanTime"/> mit Namen senden. Geräte mit "Finder"-Namen stehen vorne.
+    /// </summary>
+    public static async Task<List<BleDeviceInfo>> ListDevicesAsync(TimeSpan scanTime, CancellationToken ct = default)
+    {
+        var devices = new Dictionary<ulong, BleDeviceInfo>();
+        var watcher = new BluetoothLEAdvertisementWatcher { ScanningMode = BluetoothLEScanningMode.Active };
+        watcher.Received += (_, e) =>
+        {
+            var name = e.Advertisement.LocalName;
+            if (string.IsNullOrEmpty(name)) return;
+            lock (devices)
+                if (!devices.ContainsKey(e.BluetoothAddress))
+                    devices[e.BluetoothAddress] = new BleDeviceInfo(e.BluetoothAddress, name, Paired: false);
+        };
+        watcher.Start();
+        try
+        {
+            var paired = await DeviceInformation.FindAllAsync(BluetoothLEDevice.GetDeviceSelectorFromPairingState(true));
+            foreach (var info in paired)
+            {
+                using var device = await BluetoothLEDevice.FromIdAsync(info.Id);
+                if (device is null) continue;
+                var name = string.IsNullOrEmpty(device.Name) ? info.Name : device.Name;
+                lock (devices)
+                    devices[device.BluetoothAddress] = new BleDeviceInfo(device.BluetoothAddress, name, Paired: true);
+            }
+            await Task.Delay(scanTime, ct);
+        }
+        finally
+        {
+            watcher.Stop();
+        }
+
+        lock (devices)
+            return devices.Values
+                .OrderByDescending(d => d.IsFinder)
+                .ThenByDescending(d => d.Paired)
+                .ThenBy(d => d.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
     }
 
     public async Task ConnectAsync(ulong address)

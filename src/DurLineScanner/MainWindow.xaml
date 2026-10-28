@@ -39,6 +39,11 @@
                     <Ellipse x:Name="ConnectionDot" Width="10" Height="10" Fill="#B0B0B0" VerticalAlignment="Center" />
                     <TextBlock x:Name="ConnectionText" Text="nicht verbunden" VerticalAlignment="Center"
                                Margin="8,0,14,0" MinWidth="170" />
+                    <ComboBox x:Name="DeviceBox" DisplayMemberPath="Label" MinWidth="260" MaxWidth="360"
+                              VerticalAlignment="Center" ToolTip="Bluetooth-Gerät, mit dem verbunden wird" />
+                    <Button x:Name="RefreshDevicesButton" Content="⟳" Click="RefreshDevicesButton_Click"
+                            Margin="4,0,8,0" MinWidth="30" VerticalAlignment="Center"
+                            ToolTip="Gekoppelte und sendende Bluetooth-Geräte neu suchen" />
                     <Button x:Name="ConnectButton" Content="Verbinden" Click="ConnectButton_Click"
                             Style="{StaticResource AccentButton}" MinWidth="100" />
                 </StackPanel>

@@ -67,8 +67,11 @@ and, if you wish, a desktop shortcut. A separate .NET installation is not requir
 
 1. Switch on the meter. Disconnect or close any phone app that may be connected – the device can only be connected
    to one partner at a time.
-2. In the DUR-line Scanner, click **Connect** at the top right. The program searches for a device named "Finder …".
-3. If Windows asks for a **PIN**, enter `000001`.
+2. Select the meter in the device list at the top right. The list shows the Bluetooth devices paired in Windows and
+   those currently advertising; the SF 4000 ("Finder S2-…") is preselected. **⟳** searches again, e.g. if the device
+   was switched on after the program started.
+3. Click **Connect**.
+4. If Windows asks for a **PIN**, enter `000001`.
 
 After the first connection the program remembers the Bluetooth address. The green dot next to the device name
 shows an active connection; **Disconnect** ends it.

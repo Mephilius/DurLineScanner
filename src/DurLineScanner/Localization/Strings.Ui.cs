@@ -37,6 +37,8 @@ public static partial class L
         d["• Laufzeit: .NET und WPF von Microsoft (MIT-Lizenz)"] = "• Runtime: .NET and WPF by Microsoft (MIT license)";
         d["nicht verbunden"] = "not connected";
         d["Verbinden"] = "Connect";
+        d["Bluetooth-Gerät, mit dem verbunden wird"] = "Bluetooth device to connect to";
+        d["Gekoppelte und sendende Bluetooth-Geräte neu suchen"] = "Search again for paired and advertising Bluetooth devices";
         d["Trennen"] = "Disconnect";
         d["Standort"] = "Site";
         d["Standorte verwalten: Adresse, Koordinaten, Schüsselgröße, LNB"] = "Manage sites: address, coordinates, dish size, LNB";
@@ -142,6 +144,11 @@ public static partial class L
         d["Kein SF 4000 gefunden. Gerät einschalten und Handy-App trennen."] = "No SF 4000 found. Switch the device on and disconnect the phone app.";
         d["Verbinde …"] = "Connecting …";
         d["Kein SF 4000 gefunden."] = "No SF 4000 found.";
+        d["Suche Bluetooth-Geräte …"] = "Searching for Bluetooth devices …";
+        d["Keine Bluetooth-Geräte gefunden. Gerät einschalten und Handy-App trennen."] = "No Bluetooth devices found. Switch the device on and disconnect the phone app.";
+        d["{0} Bluetooth-Geräte gefunden."] = "{0} Bluetooth devices found.";
+        d["Gerätesuche fehlgeschlagen: {0}"] = "Device search failed: {0}";
+        d["{0} ({1}, gekoppelt)"] = "{0} ({1}, paired)";
         d["Verbunden mit {0}, Modell {1}."] = "Connected to {0}, model {1}.";
         d["Verbindung fehlgeschlagen: {0}"] = "Connection failed: {0}";
         d["{0} · Modell {1}"] = "{0} · model {1}";
