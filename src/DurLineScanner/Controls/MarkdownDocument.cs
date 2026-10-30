@@ -7,9 +7,9 @@ using System.Windows.Media;
 namespace DurLineScanner.Controls;
 
 /// <summary>
-/// Wandelt das Benutzerhandbuch (GitHub-Markdown) in ein FlowDocument: Überschriften, Absätze, Listen, Tabellen,
-/// Zitate, Trennlinien, Code sowie fett, kursiv, Code und Links im Text. Sprungziele (#abschnitt) folgen den
-/// GitHub-Regeln, damit das Inhaltsverzeichnis funktioniert.
+/// Converts the user guide (GitHub Markdown) into a FlowDocument: headings, paragraphs, lists, tables,
+/// quotes, rules, code, plus bold, italic, code and links in text. Anchors (#section) follow the
+/// GitHub rules so the table of contents works.
 /// </summary>
 public static partial class MarkdownDocument
 {
@@ -19,8 +19,8 @@ public static partial class MarkdownDocument
     private static readonly Brush HeaderBackground = Palette.Brush(Color.FromRgb(0xF6, 0xF8, 0xFA));
     private static readonly Brush LinkBrush = Palette.Brush(Palette.Accent);
 
-    /// <param name="markdown">Markdown-Text.</param>
-    /// <param name="openLink">Wird für Links aufgerufen, die nicht auf einen Abschnitt im Dokument zeigen.</param>
+    /// <param name="markdown">Markdown text.</param>
+    /// <param name="openLink">Called for links that do not point to a section in the document.</param>
     public static FlowDocument Build(string markdown, Action<string> openLink)
     {
         var doc = new FlowDocument
@@ -108,7 +108,7 @@ public static partial class MarkdownDocument
             }
             else
             {
-                // Absatz: aufeinanderfolgende Zeilen bis zur nächsten Leerzeile oder einem anderen Block
+                // Paragraph: consecutive lines up to the next blank line or another block
                 var text = new List<string>();
                 for (; i < lines.Length; i++)
                 {
@@ -125,7 +125,7 @@ public static partial class MarkdownDocument
         return doc;
     }
 
-    /// <summary>Liste mit Fortsetzungszeilen und einer Ebene Unterpunkten.</summary>
+    /// <summary>List with continuation lines and one level of sub-items.</summary>
     private static List BuildList(string[] lines, ref int i, Action<string> navigate)
     {
         var first = ListItemRegex().Match(lines[i]);
@@ -144,7 +144,7 @@ public static partial class MarkdownDocument
             if (!match.Success || match.Groups[1].Length < indent) break;
             if (match.Groups[1].Length > indent)
             {
-                // Unterpunkte an den letzten Eintrag hängen
+                // Attach sub-items to the last entry
                 if (list.ListItems.LastListItem is { } last) last.Blocks.Add(BuildList(lines, ref i, navigate));
                 else i++;
                 continue;
@@ -161,7 +161,7 @@ public static partial class MarkdownDocument
             AddInlines(paragraph.Inlines, string.Join(" ", text), navigate);
             list.ListItems.Add(new ListItem(paragraph));
 
-            // Leerzeile innerhalb der Liste überspringen, wenn es danach weitergeht
+            // Skip a blank line inside the list if the list continues after it
             if (i + 1 < lines.Length && lines[i].Trim().Length == 0 && ListItemRegex().Match(lines[i + 1]) is { Success: true } m
                 && m.Groups[1].Length >= indent)
                 i++;
@@ -175,8 +175,16 @@ public static partial class MarkdownDocument
 
         var header = Cells(rows[0]);
         var table = new Table { CellSpacing = 0, BorderBrush = Border, BorderThickness = new Thickness(1, 1, 0, 0), Margin = new Thickness(0, 4, 0, 14) };
+        // FlowDocument tables have no auto width (columns would collapse otherwise) – star widths by text length
+        var bodyCells = rows.Select(Cells).ToList();
         for (int c = 0; c < header.Length; c++)
-            table.Columns.Add(new TableColumn { Width = c == header.Length - 1 ? new GridLength(1, GridUnitType.Star) : GridLength.Auto });
+        {
+            var texts = bodyCells.Select(r => c < r.Length ? InlineMarkupRegex().Replace(r[c], "$1") : "").ToList();
+            int longest = texts.Max(t => t.Length);
+            int longestWord = texts.SelectMany(t => t.Split(' ')).Max(w => w.Length);
+            double weight = Math.Max(Math.Clamp(longest, 6, 60), longestWord * 1.5 + 2); // don't break words
+            table.Columns.Add(new TableColumn { Width = new GridLength(weight, GridUnitType.Star) });
+        }
 
         var group = new TableRowGroup();
         table.RowGroups.Add(group);
@@ -184,7 +192,7 @@ public static partial class MarkdownDocument
         foreach (var row in rows)
         {
             var cells = Cells(row);
-            if (cells.All(c => c.Trim('-', ':', ' ').Length == 0)) continue; // Trennzeile |---|---|
+            if (cells.All(c => c.Trim('-', ':', ' ').Length == 0)) continue; // separator row |---|---|
             var tableRow = new TableRow { Background = isHeader ? HeaderBackground : null };
             for (int c = 0; c < header.Length; c++)
             {
@@ -201,7 +209,7 @@ public static partial class MarkdownDocument
         return table;
     }
 
-    /// <summary>Fett, kursiv, Code und Links innerhalb einer Zeile.</summary>
+    /// <summary>Bold, italic, code and links within a line.</summary>
     private static void AddInlines(InlineCollection target, string text, Action<string> navigate)
     {
         int pos = 0;
@@ -237,7 +245,7 @@ public static partial class MarkdownDocument
         if (pos < text.Length) target.Add(new Run(text[pos..]));
     }
 
-    /// <summary>Sprungziel nach GitHub-Regeln: klein, Satzzeichen weg, Leerzeichen zu Bindestrichen.</summary>
+    /// <summary>Anchor following GitHub rules: lowercase, punctuation removed, spaces to hyphens.</summary>
     public static string Anchor(string heading)
     {
         var plain = InlineMarkupRegex().Replace(heading, "$1").Trim().ToLowerInvariant();
