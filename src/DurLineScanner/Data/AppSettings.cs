@@ -9,14 +9,14 @@ public enum ReceiverKind
 {
     None,
 
-    /// <summary>Enigma2-Receiver (Dreambox, VU+, Gigablue …) mit OpenWebif.</summary>
+    /// <summary>Enigma2-Receiver (Dreambox, VU+, Gigablue …) with OpenWebif.</summary>
     Enigma2,
 
-    /// <summary>TVHeadend-Server.</summary>
+    /// <summary>TVHeadend server.</summary>
     Tvheadend,
 }
 
-/// <summary>Einstellungen unter %AppData%\DurLineScanner\settings.json; das Passwort ist per DPAPI verschlüsselt.</summary>
+/// <summary>Settings in %AppData%\DurLineScanner\settings.json; the password is encrypted with DPAPI.</summary>
 public sealed class AppSettings
 {
     public static readonly string Path = System.IO.Path.Combine(
@@ -28,26 +28,26 @@ public sealed class AppSettings
         Converters = { new JsonStringEnumConverter() },
     };
 
-    /// <summary>Sprache der Oberfläche; wirkt nach dem Neustart.</summary>
+    /// <summary>UI language; takes effect after restart.</summary>
     public Localization.AppLanguage Language { get; set; }
 
     public ReceiverKind ReceiverKind { get; set; }
 
-    /// <summary>Name oder IP des Receivers, z.B. "192.168.1.20" oder "tv.example.de", optional mit Pfad ("server/tvheadend").</summary>
+    /// <summary>Name or IP of the receiver, e.g. "192.168.1.20" or "tv.example.de", optionally with a path ("server/tvheadend").</summary>
     public string ReceiverAddress { get; set; } = "";
 
-    /// <summary>Port; null = Standard (TVHeadend 9981, Enigma2 80, mit HTTPS 443).</summary>
+    /// <summary>Port; null = default (TVHeadend 9981, Enigma2 80, with HTTPS 443).</summary>
     public int? ReceiverPort { get; set; }
 
-    /// <summary>Verschlüsselte Verbindung (HTTPS), z.B. hinter einem Reverse-Proxy.</summary>
+    /// <summary>Encrypted connection (HTTPS), e.g. behind a reverse proxy.</summary>
     public bool ReceiverHttps { get; set; }
 
     [JsonIgnore]
     public int ReceiverDefaultPort => ReceiverHttps ? 443 : ReceiverKind == ReceiverKind.Tvheadend ? 9981 : 80;
 
     /// <summary>
-    /// Zerlegt eine vollständig eingegebene Adresse wie "https://server:8443/tvh" in Adresse, Port und HTTPS.
-    /// Auch für ältere Einstellungen, in denen alles im Adressfeld stand.
+    /// Splits a fully entered address like "https://server:8443/tvh" into address, port and HTTPS.
+    /// Also for older settings where everything was in the address field.
     /// </summary>
     public void SplitReceiverAddress()
     {
@@ -56,7 +56,7 @@ public sealed class AppSettings
         bool hasScheme = text.Contains("://");
         if (!Uri.TryCreate(hasScheme ? text : "http://" + text, UriKind.Absolute, out var uri)) return;
         if (hasScheme) ReceiverHttps = uri.Scheme == Uri.UriSchemeHttps;
-        // Port nur übernehmen, wenn er ausdrücklich angegeben war
+        // Only take the port if it was given explicitly
         if (!uri.IsDefaultPort || text.Contains($":{uri.Port}")) ReceiverPort = uri.Port;
         ReceiverAddress = uri.Host + uri.AbsolutePath.TrimEnd('/');
     }
@@ -65,7 +65,7 @@ public sealed class AppSettings
 
     public string ReceiverPasswordProtected { get; set; } = "";
 
-    /// <summary>Senderliste beim Programmstart vom Receiver aktualisieren.</summary>
+    /// <summary>Update the channel list from the receiver on program start.</summary>
     public bool LoadChannelsOnStart { get; set; }
 
     public Guid? LastSiteId { get; set; }

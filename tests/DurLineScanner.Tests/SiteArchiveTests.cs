@@ -32,7 +32,7 @@ public class SiteArchiveTests
             Assert.Equal(Weather.Rain, loaded.Weather);
             Assert.Equal(14, loaded.Results[0].MerDb);
 
-            // Zweiter Import: nichts doppelt, Standort schon bekannt
+            // Second import: no duplicates, site already known
             var again = SiteArchive.Import(zip, target, [result.Site]);
             Assert.False(again.SiteAdded);
             Assert.Equal(0, again.Imported);

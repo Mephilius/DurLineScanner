@@ -5,8 +5,8 @@ using System.Xml.Linq;
 namespace DurLineScanner.Data;
 
 /// <summary>
-/// Transponderliste im Enigma2-Format (satellites.xml), z.B. von OpenPLi (aus LyngSat erzeugt)
-/// oder vom eigenen Receiver (/etc/tuxbox/satellites.xml).
+/// Transponder list in Enigma2 format (satellites.xml), e.g. from OpenPLi (generated from LyngSat)
+/// or from your own receiver (/etc/tuxbox/satellites.xml).
 /// </summary>
 public sealed partial class SatellitesXml
 {
@@ -25,19 +25,19 @@ public sealed partial class SatellitesXml
     }
 
     /// <summary>
-    /// Empfangbare Satelliten, je Position und Band ein Eintrag, nach Orbitposition sortiert.
-    /// LNB-Frequenzen sind die üblichen Standardwerte: Universal-LNB 9750/10600 MHz im Ku-Band, 5150 MHz im C-Band.
+    /// Receivable satellites, one entry per position and band, sorted by orbital position.
+    /// LNB frequencies are the usual defaults: universal LNB 9750/10600 MHz in Ku band, 5150 MHz in C band.
     /// </summary>
     public IReadOnlyList<Satellite> Satellites { get; }
 
-    /// <summary>Herkunft und Stand für die Anzeige, z.B. "satellites.xml vom 27.10.2026".</summary>
+    /// <summary>Source and date for display, e.g. "satellites.xml vom 27.10.2026".</summary>
     public string Description { get; }
 
     public int SatelliteCount => _byPosition.Count;
 
     /// <summary>
-    /// Heruntergeladene oder importierte Liste. Es wird keine Liste mitgeliefert – fehlt sie, lädt die App
-    /// sie beim Start von OpenPLi. Eine beschädigte Kopie wird ignoriert.
+    /// Downloaded or imported list. No list is bundled – if it is missing, the app downloads it
+    /// from OpenPLi on startup. A corrupt copy is ignored.
     /// </summary>
     public static SatellitesXml? LoadUserCopy()
     {
@@ -66,7 +66,7 @@ public sealed partial class SatellitesXml
             int before = list.Count;
             foreach (var tp in sat.Elements("transponder"))
             {
-                // Zirkulare Polarisation (2/3) ist mit einem linearen Ku-LNB nicht empfangbar
+                // Circular polarization (2/3) cannot be received with a linear Ku LNB
                 int pol = (int?)tp.Attribute("polarization") ?? -1;
                 if (pol is not (0 or 1)) continue;
                 long freq = (long?)tp.Attribute("frequency") ?? 0;
@@ -82,7 +82,7 @@ public sealed partial class SatellitesXml
                     FecName((int?)tp.Attribute("fec_inner"))));
             }
 
-            // Erster Name je Position und Band gewinnt, z.B. "19.2E Astra 1N/1P"
+            // First name per position and band wins, e.g. "19.2E Astra 1N/1P"
             var name = (string?)sat.Attribute("name") ?? $"{position / 10.0:0.0}";
             foreach (bool cBand in list.Skip(before).Select(t => IsCBand(t.FrequencyMHz)).Distinct())
                 names.TryAdd((position, cBand), name);
@@ -91,7 +91,7 @@ public sealed partial class SatellitesXml
         if (byPosition.Count == 0)
             throw new InvalidDataException(L.T("Die Datei enthält keine Satelliten (kein satellites.xml-Format?)."));
 
-        // OpenPLi schreibt das Erstellungsdatum in einen Kommentar am Anfang
+        // OpenPLi writes the creation date into a comment at the top
         var created = CreatedRegex().Match(text);
         var stand = created.Success && DateTime.TryParse(created.Groups[1].Value, out var date)
             ? date
@@ -108,10 +108,10 @@ public sealed partial class SatellitesXml
         return new SatellitesXml(byPosition, satellites, L.F("satellites.xml vom {0:dd.MM.yyyy}", stand));
     }
 
-    /// <summary>C-Band 3,4–4,2 GHz; alles andere wird als Ku-Band behandelt.</summary>
+    /// <summary>C band 3.4–4.2 GHz; everything else is treated as Ku band.</summary>
     public static bool IsCBand(int frequencyMHz) => frequencyMHz < 5000;
 
-    /// <summary>Lädt die aktuelle OpenPLi-Liste herunter, prüft sie und speichert sie als Benutzerkopie.</summary>
+    /// <summary>Downloads the current OpenPLi list, validates it and saves it as the user copy.</summary>
     public static async Task<SatellitesXml> DownloadAsync(CancellationToken ct = default)
     {
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(60) };
@@ -119,12 +119,12 @@ public sealed partial class SatellitesXml
         var temp = UserCopyPath + ".tmp";
         Directory.CreateDirectory(Path.GetDirectoryName(UserCopyPath)!);
         await File.WriteAllBytesAsync(temp, bytes, ct);
-        var parsed = Load(temp);   // erst prüfen, dann die alte Kopie ersetzen
+        var parsed = Load(temp);   // validate first, then replace the old copy
         File.Move(temp, UserCopyPath, overwrite: true);
         return parsed;
     }
 
-    /// <summary>Übernimmt eine satellites.xml (z.B. vom Receiver) als Benutzerkopie.</summary>
+    /// <summary>Adopts a satellites.xml (e.g. from the receiver) as the user copy.</summary>
     public static SatellitesXml Import(string path)
     {
         var parsed = Load(path);
@@ -133,7 +133,7 @@ public sealed partial class SatellitesXml
         return parsed;
     }
 
-    /// <summary>Transponder einer Orbitposition (Zehntelgrad, West negativ), ±0,2° Toleranz.</summary>
+    /// <summary>Transponders of an orbital position (tenths of a degree, west negative), ±0.2° tolerance.</summary>
     public IReadOnlyList<Transponder>? GetTransponders(int positionTenths)
     {
         var matches = _byPosition.Where(kv => Math.Abs(kv.Key - positionTenths) <= 2).SelectMany(kv => kv.Value).ToList();
@@ -150,7 +150,7 @@ public sealed partial class SatellitesXml
         _ => null,
     };
 
-    // Enigma2-Kodierung von fec_inner
+    // Enigma2 encoding of fec_inner
     private static string? FecName(int? fec) => fec switch
     {
         1 => "1/2",

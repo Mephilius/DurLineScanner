@@ -5,12 +5,12 @@ using DurLineScanner.Data;
 
 namespace DurLineScanner.Controls;
 
-/// <summary>Tooltip mit den Programmen eines Transponders (aus der importierten lamedb).</summary>
+/// <summary>Tooltip listing the channels of a transponder (from the imported lamedb).</summary>
 public static class ChannelToolTip
 {
     private const int MaxShown = 45;
 
-    /// <summary>Orbitposition (Zehntelgrad) der angezeigten Messreihe.</summary>
+    /// <summary>Orbital position (tenths of a degree) of the displayed measurement series.</summary>
     public static int PositionTenths { get; set; } = 192;
 
     public static FrameworkElement Build(int frequencyMHz, Polarization pol, int symbolRateKs, string? modulation)

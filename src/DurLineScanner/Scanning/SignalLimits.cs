@@ -1,6 +1,6 @@
 namespace DurLineScanner.Scanning;
 
-/// <summary>Bewertungsstufe eines Messwerts.</summary>
+/// <summary>Rating level of a measured value.</summary>
 public enum Grade
 {
     VeryBad,
@@ -10,10 +10,10 @@ public enum Grade
     VeryGood,
 }
 
-/// <summary>Bereich [From, To) einer Skala mit Bewertung und Bedeutung.</summary>
+/// <summary>Range [From, To) of a scale with rating and meaning.</summary>
 public sealed record GradeBand(double From, double To, Grade Grade, string Meaning);
 
-/// <summary>Skala eines Messwerts: Anzeigebereich, Bewertungsbereiche und Erklärung.</summary>
+/// <summary>Scale of a measured value: display range, rating ranges and explanation.</summary>
 public sealed record MetricScale(
     string Title,
     string Unit,
@@ -23,13 +23,13 @@ public sealed record MetricScale(
     string Explanation,
     string Basis)
 {
-    /// <summary>Wandelt den angezeigten Skalenwert in Text um (z.B. BER-Exponent → "1E-5").</summary>
+    /// <summary>Converts the displayed scale value to text (e.g. BER exponent → "1E-5").</summary>
     public Func<double, string> Format { get; init; } = v => v.ToString("0.#");
 
-    /// <summary>Eigene Bereichsbeschriftung, z.B. für die umgekehrte BER-Skala.</summary>
+    /// <summary>Custom range label, e.g. for the inverted BER scale.</summary>
     public Func<GradeBand, string>? RangeFormatter { get; init; }
 
-    /// <summary>false: Wert wird nur angezeigt, nicht bewertet (keine Farbbereiche).</summary>
+    /// <summary>false: value is only displayed, not rated (no color ranges).</summary>
     public bool Graded { get; init; } = true;
 
     public Grade? Evaluate(double? value)
@@ -42,7 +42,7 @@ public sealed record MetricScale(
         return v < Bands[0].From ? Bands[0].Grade : Bands[^1].Grade;
     }
 
-    /// <summary>Bereichstext für den Tooltip, z.B. "60 – 74 dBµV" oder "unter 47 dBµV".</summary>
+    /// <summary>Range text for the tooltip, e.g. "60 – 74 dBµV" or "unter 47 dBµV".</summary>
     public string RangeText(GradeBand band)
     {
         if (RangeFormatter is not null) return RangeFormatter(band);
@@ -54,14 +54,14 @@ public sealed record MetricScale(
 }
 
 /// <summary>
-/// Richtwerte für die Bewertung von Sat-ZF-Signalen.
+/// Guideline values for rating sat IF signals.
 ///
-/// MER und C/N: Empfangsschwelle (QEF, quasi fehlerfrei) nach ETSI EN 302 307-1 Tab. 13 (DVB-S2) bzw.
-/// EN 300 421 (DVB-S, Eb/N0 nach Viterbi in Es/N0 umgerechnet). Reale Empfänger brauchen etwa 1 dB mehr.
-/// Bewertung nach Reserve über der Schwelle.
+/// MER and C/N: reception threshold (QEF, quasi error-free) per ETSI EN 302 307-1 Tab. 13 (DVB-S2) or
+/// EN 300 421 (DVB-S, Eb/N0 after Viterbi converted to Es/N0). Real receivers need about 1 dB more.
+/// Rated by margin above the threshold.
 ///
-/// Pegel: Bereich an der Teilnehmerdose nach EN 60728-1 für DVB-S/S2: 47–77 dBµV.
-/// Der Pegel des SF 4000 ist nicht kalibriert.
+/// Level: range at the subscriber wall outlet per EN 60728-1 for DVB-S/S2: 47–77 dBµV.
+/// The SF 4000 level is not calibrated.
 /// </summary>
 public static class SignalLimits
 {
@@ -69,7 +69,7 @@ public static class SignalLimits
     public const double MarginMarginal = 3;
     public const double MarginGood = 6;
 
-    // Es/N0 in dB für QEF
+    // Es/N0 in dB for QEF
     private static readonly Dictionary<(string System, string Modulation, string Fec), double> Thresholds = new()
     {
         [("DVB-S", "QPSK", "1/2")] = 4.1,
@@ -106,8 +106,8 @@ public static class SignalLimits
     };
 
     /// <summary>
-    /// Empfangsschwelle in dB und deren Beschreibung. Fehlende Angaben werden vorsichtig ergänzt:
-    /// ohne FEC die höchste übliche Coderate der Modulation, ganz ohne Angaben DVB-S2 8PSK 3/4.
+    /// Reception threshold in dB and its description. Missing details are filled in conservatively:
+    /// without FEC the highest common code rate of the modulation, with no details at all DVB-S2 8PSK 3/4.
     /// </summary>
     public static (double Db, string Description) Threshold(string? system, string? modulation, string? fec)
     {
@@ -152,12 +152,12 @@ public static class SignalLimits
         explanation,
         L.F("Empfangsschwelle {0:0.0} dB für {1} (ETSI EN 302 307 / EN 300 421, Reserve +1 / +3 / +6 dB)", t, basis));
 
-    /// <summary>Allgemeine MER/C/N-Erklärung ohne konkreten Transponder (Tabellenköpfe).</summary>
+    /// <summary>Generic MER/C/N explanation without a specific transponder (table headers).</summary>
     public static MetricScale GenericSnr(string title) => title == "MER"
         ? MerScale(Threshold(null, null, null).Db, L.T("DVB-S2 8PSK 3/4 als Beispiel"))
         : CnScale(Threshold(null, null, null).Db, L.T("DVB-S2 8PSK 3/4 als Beispiel"));
 
-    /// <summary>Beispielschwellen für den Tooltip.</summary>
+    /// <summary>Example thresholds for the tooltip.</summary>
     public static string ThresholdExamples => L.T(
         "Empfangsschwellen: DVB-S QPSK 3/4: 6,9 dB · DVB-S2 QPSK 3/4: 4,0 dB · 8PSK 2/3: 6,6 dB · " +
         "8PSK 3/4: 7,9 dB · 8PSK 5/6: 9,4 dB");
@@ -206,7 +206,7 @@ public static class SignalLimits
             "Signal ankommt – nicht, ob es sauber ist. Auch ein falscher Satellit kann viel Stärke haben."),
         L.T("Geräteanzeige SF 4000"));
 
-    /// <summary>Bitfehlerrate vor der Fehlerkorrektur, als Exponent (-log10) dargestellt: Skala 1E-1 … 1E-8.</summary>
+    /// <summary>Bit error rate before error correction, shown as exponent (-log10): scale 1E-1 … 1E-8.</summary>
     public static readonly MetricScale BerExponent = new MetricScale(
         "BER", "", 0, 8,
         [
@@ -229,8 +229,8 @@ public static class SignalLimits
     };
 
     /// <summary>
-    /// Bei DVB-S2 liefert das SF 4000 BER-Werte, die nicht zur MER passen (z.B. 4E-2 bei MER 17 dB) –
-    /// vermutlich eine andere interne Größe. Daher nur anzeigen, nicht bewerten.
+    /// For DVB-S2 the SF 4000 reports BER values that do not match the MER (e.g. 4E-2 at MER 17 dB) –
+    /// probably a different internal quantity. Hence display only, do not rate.
     /// </summary>
     public static readonly MetricScale BerUngraded = BerExponent with
     {

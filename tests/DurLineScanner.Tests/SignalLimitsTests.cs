@@ -8,17 +8,17 @@ public class SignalLimitsTests
     [InlineData("DVB-S2", "8PSK", "3/4", 7.9)]
     [InlineData("DVB-S2", "QPSK", "3/4", 4.0)]
     [InlineData("DVB-S", "QPSK", "5/6", 7.9)]
-    [InlineData("DVB-S", "QPSK", null, 8.4)]       // ohne FEC: höchste Coderate = vorsichtig
-    [InlineData(null, null, null, 7.9)]            // gar keine Angaben
+    [InlineData("DVB-S", "QPSK", null, 8.4)]       // no FEC: highest code rate = conservative
+    [InlineData(null, null, null, 7.9)]            // no information at all
     public void Threshold(string? system, string? modulation, string? fec, double expected) =>
         Assert.Equal(expected, SignalLimits.Threshold(system, modulation, fec).Db);
 
     [Theory]
-    [InlineData(7.0, Grade.VeryBad)]     // unter der Schwelle 7,9
+    [InlineData(7.0, Grade.VeryBad)]     // below the threshold 7.9
     [InlineData(8.5, Grade.Bad)]         // < +1 dB
-    [InlineData(10.0, Grade.Marginal)]   // +2,1 dB
-    [InlineData(12.0, Grade.Good)]       // +4,1 dB
-    [InlineData(17.3, Grade.VeryGood)]   // gemessen am LNB-Port
+    [InlineData(10.0, Grade.Marginal)]   // +2.1 dB
+    [InlineData(12.0, Grade.Good)]       // +4.1 dB
+    [InlineData(17.3, Grade.VeryGood)]   // measured at the LNB port
     public void Mer_8psk34(double mer, Grade expected) =>
         Assert.Equal(expected, SignalLimits.MerScale(7.9, "").Evaluate(mer));
 

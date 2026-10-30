@@ -8,7 +8,7 @@ using Windows.Storage.Streams;
 
 namespace DurLineScanner.Device;
 
-/// <summary>Eintrag der Geräteauswahl.</summary>
+/// <summary>Entry in the device selection.</summary>
 public sealed record BleDeviceInfo(ulong Address, string Name, bool Paired)
 {
     public bool IsFinder => Name.StartsWith(Sf4000Client.DeviceNamePrefix, StringComparison.OrdinalIgnoreCase);
@@ -19,8 +19,8 @@ public sealed record BleDeviceInfo(ulong Address, string Name, bool Paired)
 }
 
 /// <summary>
-/// Bluetooth-LE-Verbindung zum SF 4000 BT ("Finder S2-…"), Lierda-UART-Brücke:
-/// Befehle an FF01, Antworten per Notify von FF02.
+/// Bluetooth LE connection to the SF 4000 BT ("Finder S2-…"), Lierda UART bridge:
+/// commands to FF01, responses via notify from FF02.
 /// </summary>
 public sealed class Sf4000Client : IAsyncDisposable
 {
@@ -30,7 +30,7 @@ public sealed class Sf4000Client : IAsyncDisposable
     private static readonly Guid TxUuid = Guid.Parse("0000ff01-0000-1000-8000-00805f9b34fb");
     private static readonly Guid RxUuid = Guid.Parse("0000ff02-0000-1000-8000-00805f9b34fb");
 
-    // Das Gerät antwortet manchmal gar nicht oder erst nach >1 s
+    // The device sometimes does not respond at all or only after >1 s
     private static readonly TimeSpan ResponseTimeout = TimeSpan.FromMilliseconds(1800);
     private const int Retries = 3;
 
@@ -49,7 +49,7 @@ public sealed class Sf4000Client : IAsyncDisposable
 
     public bool IsConnected => _device?.ConnectionStatus == BluetoothConnectionStatus.Connected;
 
-    /// <summary>Sucht per Advertisement nach einem Gerät, dessen Name mit "Finder" beginnt.</summary>
+    /// <summary>Scans advertisements for a device whose name starts with "Finder".</summary>
     public static async Task<(ulong Address, string Name)?> FindDeviceAsync(TimeSpan timeout, CancellationToken ct = default)
     {
         var found = new TaskCompletionSource<(ulong, string)>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -73,8 +73,8 @@ public sealed class Sf4000Client : IAsyncDisposable
     }
 
     /// <summary>
-    /// Bluetooth-LE-Geräte zur Auswahl: in Windows gekoppelte Geräte plus alle, die während
-    /// <paramref name="scanTime"/> mit Namen senden. Geräte mit "Finder"-Namen stehen vorne.
+    /// Bluetooth LE devices to choose from: devices paired in Windows plus all that advertise a name
+    /// during <paramref name="scanTime"/>. Devices with a "Finder" name come first.
     /// </summary>
     public static async Task<List<BleDeviceInfo>> ListDevicesAsync(TimeSpan scanTime, CancellationToken ct = default)
     {
@@ -170,7 +170,7 @@ public sealed class Sf4000Client : IAsyncDisposable
 
     public async ValueTask DisposeAsync() => await DisconnectAsync();
 
-    /// <summary>Gerätekennung, z.B. "260B".</summary>
+    /// <summary>Device ID, e.g. "260B".</summary>
     public async Task<string> IdentifyAsync(CancellationToken ct = default)
     {
         var response = await RequestAsync(Sf4000Protocol.Command(Sf4000Protocol.CmdIdentify), ct);
@@ -195,7 +195,7 @@ public sealed class Sf4000Client : IAsyncDisposable
             ?? throw new InvalidDataException(L.F("Ungültige Statusantwort: {0}", Convert.ToHexString(response)));
     }
 
-    /// <summary>Sendet einen Befehl und wartet auf die Antwort mit demselben Befehlscode.</summary>
+    /// <summary>Sends a command and waits for the response with the same command code.</summary>
     private async Task<byte[]> RequestAsync(byte[] command, CancellationToken ct)
     {
         await _requestLock.WaitAsync(ct);
@@ -230,7 +230,7 @@ public sealed class Sf4000Client : IAsyncDisposable
         using (var reader = DataReader.FromBuffer(args.CharacteristicValue))
             reader.ReadBytes(data);
 
-        // Verspätete Antworten auf andere Befehle werden ignoriert
+        // Late responses to other commands are ignored
         if (data.Length >= 2 && data[0] == Sf4000Protocol.Prefix && data[1] == _pendingCode)
             Volatile.Read(ref _pending)?.TrySetResult(data);
     }

@@ -6,12 +6,12 @@ using DurLineScanner.Scanning;
 namespace DurLineScanner.Controls;
 
 /// <summary>
-/// Zeigerinstrument: 240°-Skala mit farbigen Bewertungsbereichen, Zeiger, Spitzenwert-Marke
-/// und Wert mit Bewertung in der Mitte. Tooltip erklärt den Messwert.
+/// Needle gauge: 240° scale with colored grade bands, needle, peak marker
+/// and value with grade in the center. The tooltip explains the metric.
 /// </summary>
 public sealed class GaugeControl : FrameworkElement
 {
-    private const double StartAngle = 150;  // Grad, im Uhrzeigersinn ab 3 Uhr
+    private const double StartAngle = 150;  // degrees, clockwise from 3 o'clock
     private const double SweepAngle = 240;
 
     public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register(
@@ -64,49 +64,49 @@ public sealed class GaugeControl : FrameworkElement
         set => SetValue(ScaleProperty, value);
     }
 
-    /// <summary>Wert auf der Skala (bei BER der Exponent).</summary>
+    /// <summary>Value on the scale (the exponent for BER).</summary>
     public double? Value
     {
         get => (double?)GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
     }
 
-    /// <summary>Bisher bester Wert (Spitzenwert-Marke).</summary>
+    /// <summary>Best value so far (peak marker).</summary>
     public double? Peak
     {
         get => (double?)GetValue(PeakProperty);
         set => SetValue(PeakProperty, value);
     }
 
-    /// <summary>Kleinster Wert des Mini-Scans (Bereichsbogen außen).</summary>
+    /// <summary>Smallest value of the mini scan (outer range arc).</summary>
     public double? RangeMin
     {
         get => (double?)GetValue(RangeMinProperty);
         set => SetValue(RangeMinProperty, value);
     }
 
-    /// <summary>Größter Wert des Mini-Scans.</summary>
+    /// <summary>Largest value of the mini scan.</summary>
     public double? RangeMax
     {
         get => (double?)GetValue(RangeMaxProperty);
         set => SetValue(RangeMaxProperty, value);
     }
 
-    /// <summary>Beschriftung des Bereichs, z.B. "Mini-Scan 12,1 … 15,4".</summary>
+    /// <summary>Label of the range, e.g. "Mini-Scan 12,1 … 15,4".</summary>
     public string? RangeText
     {
         get => (string?)GetValue(RangeTextProperty);
         set => SetValue(RangeTextProperty, value);
     }
 
-    /// <summary>Anzeigetext statt des Zahlenwerts, z.B. "3,6E-5".</summary>
+    /// <summary>Display text instead of the numeric value, e.g. "3,6E-5".</summary>
     public string? ValueText
     {
         get => (string?)GetValue(ValueTextProperty);
         set => SetValue(ValueTextProperty, value);
     }
 
-    /// <summary>Zusatzzeile unter dem Wert, z.B. "Reserve +11,8 dB".</summary>
+    /// <summary>Extra line below the value, e.g. "Reserve +11,8 dB".</summary>
     public string? Caption
     {
         get => (string?)GetValue(CaptionProperty);
@@ -131,22 +131,22 @@ public sealed class GaugeControl : FrameworkElement
 
     protected override void OnRender(DrawingContext dc)
     {
-        // Transparenter Hintergrund, damit der Tooltip auf der ganzen Fläche reagiert
+        // Transparent background so the tooltip responds on the whole area
         dc.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
         if (Scale is not { } scale || ActualWidth < 60 || ActualHeight < 60) return;
 
         double dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         double titleHeight = 24;
-        // Unter dem Mittelpunkt braucht der Textblock (Wert, Einheit, Bewertung, Zusatzzeile) etwa 0,95 r
+        // Below the center the text block (value, unit, grade, extra line) needs about 0.95 r
         double radius = Math.Min(ActualWidth / 2 - 16, (ActualHeight - titleHeight - 16) / 1.95);
         if (radius < 30) return;
         var center = new Point(ActualWidth / 2, titleHeight + radius + 12);
         double band = Math.Max(8, radius * 0.13);
 
-        // Titel
+        // Title
         DrawText(dc, scale.Title, SemiBold, 14, TextBrush, new Point(ActualWidth / 2, 2), dpi, center: true);
 
-        // Grundspur und farbige Bereiche (unbewertete Skalen bleiben grau)
+        // Base track and colored bands (ungraded scales stay gray)
         double arcRadius = radius - band / 2;
         dc.DrawGeometry(null, new Pen(Palette.Brush(Palette.Track), band), Arc(center, arcRadius, 0, 1));
         foreach (var b in scale.Graded ? scale.Bands : [])
@@ -157,7 +157,7 @@ public sealed class GaugeControl : FrameworkElement
             dc.DrawGeometry(null, pen, Arc(center, arcRadius, f0, f1));
         }
 
-        // Skalenstriche und Beschriftung
+        // Tick marks and labels
         var ticks = Ticks(scale);
         var tickPen = new Pen(SecondaryBrush, 1);
         foreach (var t in ticks)
@@ -170,7 +170,7 @@ public sealed class GaugeControl : FrameworkElement
             DrawText(dc, scale.Format(t), Regular, Math.Max(9, radius * 0.085), SecondaryBrush, labelPos, dpi, center: true, vCenter: true);
         }
 
-        // Bereich des Mini-Scans als Bogen außen, mit Endstrichen
+        // Mini scan range as an outer arc, with end caps
         if (RangeMin is { } rMin && RangeMax is { } rMax)
         {
             double f0 = Fraction(scale, Math.Min(rMin, rMax)), f1 = Fraction(scale, Math.Max(rMin, rMax));
@@ -182,7 +182,7 @@ public sealed class GaugeControl : FrameworkElement
                 dc.DrawLine(capPen, Polar(center, radius + 1, Angle(f)), Polar(center, radius + 10, Angle(f)));
         }
 
-        // Spitzenwert-Marke außen
+        // Peak marker outside
         if (Peak is { } peak)
         {
             double a = Angle(Fraction(scale, peak));
@@ -192,7 +192,7 @@ public sealed class GaugeControl : FrameworkElement
             dc.DrawGeometry(PeakBrush, null, Triangle(tip, l, r));
         }
 
-        // Zeiger
+        // Needle
         if (Value is { } value)
         {
             double a = Angle(Fraction(scale, value));
@@ -203,7 +203,7 @@ public sealed class GaugeControl : FrameworkElement
         }
         dc.DrawEllipse(NeedleBrush, null, center, radius * 0.07, radius * 0.07);
 
-        // Wert mit Einheit, darunter Bewertung und Zusatzzeile
+        // Value with unit, below it grade and extra line
         double valueSize = Math.Max(14, radius * 0.27);
         double smallSize = Math.Max(10, radius * 0.095);
         string valueText = ValueText ?? (Value is { } v ? v.ToString("0.0", CultureInfo.CurrentCulture) : "–");
@@ -226,7 +226,7 @@ public sealed class GaugeControl : FrameworkElement
             y = pill.Bottom + 3;
         }
 
-        // Zusatzzeile und Mini-Scan-Bereich nebeneinander, wenn die Breite reicht
+        // Extra line and mini scan range side by side if there is enough width
         if (!string.IsNullOrEmpty(Caption) && !string.IsNullOrEmpty(RangeText))
         {
             var captionFt = Text(Caption + "  ·  ", Regular, smallSize, SecondaryBrush, dpi);

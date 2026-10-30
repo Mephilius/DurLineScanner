@@ -8,7 +8,7 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Sprache vor dem ersten Fenster festlegen; "--lang=en" bzw. "--lang=de" gilt nur für diesen Start
+        // Set the language before the first window; "--lang=en" or "--lang=de" applies to this launch only
         var language = e.Args.FirstOrDefault(a => a.StartsWith("--lang=", StringComparison.OrdinalIgnoreCase))?[7..].ToLowerInvariant() switch
         {
             "en" => AppLanguage.English,

@@ -1,8 +1,8 @@
 namespace DurLineScanner.Data;
 
 /// <summary>
-/// Satelliten und Transponder aus der Transponderliste (satellites.xml): aktualisierte oder importierte
-/// Kopie (beim ersten Start von OpenPLi geladen).
+/// Satellites and transponders from the transponder list (satellites.xml): updated or imported
+/// copy (downloaded from OpenPLi on first start).
 /// </summary>
 public sealed class TransponderDatabase
 {
@@ -22,7 +22,7 @@ public sealed class TransponderDatabase
     }
 
     private static List<Transponder> Order(IEnumerable<Transponder> transponders) =>
-        // Doppelte Einträge entfernen; Reihenfolge nach Band, Polarisation, Frequenz minimiert LNB-Umschaltungen
+        // Remove duplicate entries; ordering by band, polarization, frequency minimizes LNB switching
         transponders
             .DistinctBy(t => (t.FrequencyMHz, t.Polarization))
             .OrderBy(t => t.FrequencyMHz >= 11700)

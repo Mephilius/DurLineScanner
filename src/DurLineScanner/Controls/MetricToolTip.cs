@@ -6,7 +6,7 @@ using DurLineScanner.Scanning;
 
 namespace DurLineScanner.Controls;
 
-/// <summary>Tooltip mit Erklärung eines Messwerts und seinen Bewertungsbereichen von sehr gut bis sehr schlecht.</summary>
+/// <summary>Tooltip explaining a metric and its grade bands from very good to very bad.</summary>
 public static class MetricToolTip
 {
     public static ToolTip Build(MetricScale scale, string? extra = null)
@@ -29,7 +29,7 @@ public static class MetricToolTip
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-        // Von gut nach schlecht sortiert anzeigen
+        // Show sorted from good to bad
         var bands = scale.Bands.OrderByDescending(b => b.Grade).ThenBy(b => b.From).ToList();
         for (int i = 0; i < bands.Count; i++)
         {
@@ -61,7 +61,7 @@ public static class MetricToolTip
         return new ToolTip { Content = panel };
     }
 
-    /// <summary>Hängt den Tooltip an ein Element; bleibt sichtbar, solange die Maus darauf steht.</summary>
+    /// <summary>Attaches the tooltip to an element; it stays visible while the mouse is over it.</summary>
     public static void Attach(FrameworkElement owner, MetricScale scale, string? extra = null)
     {
         owner.ToolTip = Build(scale, extra);

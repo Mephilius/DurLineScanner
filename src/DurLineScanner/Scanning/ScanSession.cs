@@ -3,7 +3,7 @@ using DurLineScanner.Data;
 
 namespace DurLineScanner.Scanning;
 
-/// <summary>Messergebnis eines Transponders (flach, damit es sich direkt als JSON/CSV speichern lässt).</summary>
+/// <summary>Measurement result of one transponder (flat, so it can be saved directly as JSON/CSV).</summary>
 public sealed class ScanResult
 {
     public int FrequencyMHz { get; set; }
@@ -14,11 +14,11 @@ public sealed class ScanResult
     public string? Fec { get; set; }
     public DateTime Timestamp { get; set; }
 
-    /// <summary>Empfangsschwelle für MER/C/N dieses Transponders.</summary>
+    /// <summary>Reception threshold for MER/C/N of this transponder.</summary>
     [JsonIgnore]
     public (double Db, string Description) Threshold => SignalLimits.Threshold(DvbSystem, Modulation, Fec);
 
-    /// <summary>MER-Reserve über der Empfangsschwelle.</summary>
+    /// <summary>MER margin above the reception threshold.</summary>
     [JsonIgnore]
     public double? MerMargin => Locked && MerDb is { } mer ? Math.Round(mer - Threshold.Db, 1) : null;
 
@@ -40,7 +40,7 @@ public sealed class ScanResult
     [JsonIgnore]
     public string ModulationText => string.Join(" ", new[] { DvbSystem, Modulation, Fec }.Where(s => s is not null));
 
-    /// <summary>false, wenn das Gerät den Einstellbefehl nicht bestätigt hat oder nicht antwortete.</summary>
+    /// <summary>false if the device did not acknowledge the tune command or did not respond.</summary>
     public bool TuneAccepted { get; set; }
     public bool Locked { get; set; }
 
@@ -51,7 +51,7 @@ public sealed class ScanResult
     public double? MerDb { get; set; }
     public double? Ber { get; set; }
 
-    /// <summary>Zeit bis zum Lock in Sekunden (null = kein Lock).</summary>
+    /// <summary>Time to lock in seconds (null = no lock).</summary>
     public double? LockTimeSeconds { get; set; }
 
     public string PolarizationShort => Polarization == Polarization.Horizontal ? "H" : "V";
@@ -59,8 +59,8 @@ public sealed class ScanResult
     public string Band => FrequencyMHz >= 11700 ? "High" : "Low";
 
     /// <summary>
-    /// Kein Lock, obwohl die übrigen Transponder derselben Ebene mit gutem Pegel empfangen werden:
-    /// dann ist der Transponder vermutlich abgeschaltet oder geändert (veraltete Liste) und kein Empfangsloch.
+    /// No lock although the other transponders of the same plane are received with good level:
+    /// then the transponder is probably switched off or changed (outdated list) rather than a reception hole.
     /// </summary>
     public bool ProbablyInactive { get; set; }
 
@@ -70,10 +70,10 @@ public sealed class ScanResult
 
 public enum LocationKind
 {
-    /// <summary>Teilnehmerdose in der Wohnung.</summary>
+    /// <summary>Subscriber wall outlet in the apartment.</summary>
     Socket,
 
-    /// <summary>Ausgang direkt am LNB / an der Schüssel.</summary>
+    /// <summary>Output directly at the LNB / the dish.</summary>
     LnbPort,
 }
 
@@ -88,16 +88,16 @@ public sealed class ScanSession
 
     public LocationKind LocationKind { get; set; }
 
-    /// <summary>Anzeigename des Messorts, z.B. "Wohnzimmer · Anschluss 2" oder "Port 1".</summary>
+    /// <summary>Display name of the measurement location, e.g. "Wohnzimmer · Anschluss 2" or "Port 1".</summary>
     public string LocationName { get; set; } = "";
 
-    /// <summary>Raum der Sat-Dose (null bei LNB-Port und älteren Messreihen).</summary>
+    /// <summary>Room of the sat wall outlet (null for LNB port and older measurement series).</summary>
     public string? Room { get; set; }
 
-    /// <summary>Nummer des Anschlusses im Raum bzw. des LNB-Ports.</summary>
+    /// <summary>Number of the outlet in the room, or of the LNB port.</summary>
     public int? Outlet { get; set; }
 
-    /// <summary>Standort zum Zeitpunkt des Scans (Kopie – spätere Änderungen wirken nicht zurück).</summary>
+    /// <summary>Site at the time of the scan (copy – later changes do not propagate back).</summary>
     public Site? Site { get; set; }
 
     public Weather? Weather { get; set; }
@@ -105,7 +105,7 @@ public sealed class ScanSession
     [JsonIgnore]
     public string WeatherText => Weather is { } w ? $"{WeatherInfo.Icon(w)} {WeatherInfo.Text(w)}" : L.T("Wetter unbekannt");
 
-    /// <summary>Gemessene Ebenen: "alle" oder eine Ebene wie "Low V" (z.B. Quattro-LNB-Port).</summary>
+    /// <summary>Measured planes: "alle" (all) or a single plane like "Low V" (e.g. quattro LNB port).</summary>
     public string Planes { get; set; } = "alle";
 
     public List<ScanResult> Results { get; set; } = [];
@@ -125,18 +125,18 @@ public sealed class ScanSession
                                      Started, LocationLabel, SatelliteName, LockedCount, Results.Count, HoleCount)
                                  + (string.IsNullOrWhiteSpace(Note) ? "" : $"\n{Note}");
 
-    /// <summary>Markiert nicht gelockte Transponder als "vermutlich abgeschaltet", wenn ihre Ebene sonst gut empfangen wird.</summary>
+    /// <summary>Marks unlocked transponders as "probably switched off" when their plane is otherwise received well.</summary>
     public void ClassifyMissingTransponders()
     {
         foreach (var group in Results.GroupBy(Plane.Of))
         {
             var locked = group.Where(r => r.Locked).ToList();
-            // Drei gelockte Transponder genügen als Beleg, dass Signal auf der Ebene ankommt
+            // Three locked transponders are enough evidence that signal arrives on the plane
             bool planeWorks = locked.Count >= 3;
             double? planeLevel = locked.Where(r => r.LevelDbuV.HasValue).Select(r => r.LevelDbuV!.Value).DefaultIfEmpty().Average();
             foreach (var r in group.Where(r => !r.Locked))
             {
-                // Pegel kaum schwächer als bei gelockten Nachbarn → Signal kommt an, Transponder fehlt
+                // Level barely weaker than locked neighbours → signal arrives, transponder is missing
                 r.ProbablyInactive = planeWorks && r.TuneAccepted
                                      && r.LevelDbuV.HasValue && planeLevel.HasValue
                                      && r.LevelDbuV.Value >= planeLevel.Value - 6;

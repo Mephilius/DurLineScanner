@@ -7,16 +7,16 @@ namespace DurLineScanner.Localization;
 
 public enum AppLanguage
 {
-    /// <summary>Sprache von Windows: Deutsch bei deutschem Windows, sonst Englisch.</summary>
+    /// <summary>Windows language: German on German Windows, otherwise English.</summary>
     System,
     German,
     English,
 }
 
 /// <summary>
-/// Zweisprachige Oberfläche (Deutsch/Englisch). Der deutsche Text ist zugleich der Schlüssel; die englischen
-/// Texte stehen in den Strings.*.cs-Dateien. Fehlt eine Übersetzung, bleibt der deutsche Text stehen.
-/// Die Sprache wird beim Start festgelegt, ein Wechsel wirkt nach dem Neustart.
+/// Bilingual UI (German/English). The German text doubles as the key; the English
+/// texts live in the Strings.*.cs files. If a translation is missing, the German text is kept.
+/// The language is set at startup; a change takes effect after restart.
 /// </summary>
 public static partial class L
 {
@@ -35,21 +35,21 @@ public static partial class L
         var culture = IsEnglish ? CultureInfo.GetCultureInfo("en-GB") : CultureInfo.GetCultureInfo("de-DE");
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = culture;
         CultureInfo.CurrentCulture = CultureInfo.CurrentUICulture = culture;
-        // Zahlen und Datumsangaben in Bindungen (StringFormat) im Format der Oberflächensprache
+        // Numbers and dates in bindings (StringFormat) in the format of the UI language
         FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement),
             new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(culture.IetfLanguageTag)));
     }
 
-    /// <summary>Text in der Oberflächensprache.</summary>
+    /// <summary>Text in the UI language.</summary>
     public static string T(string german) => IsEnglish && En.TryGetValue(german, out var english) ? english : german;
 
-    /// <summary>Formatierter Text; Platzhalter wie bei string.Format, z.B. L.F("{0} von {1} mit Lock", a, b).</summary>
+    /// <summary>Formatted text; placeholders as in string.Format, e.g. L.F("{0} von {1} mit Lock", a, b).</summary>
     public static string F(string germanFormat, params object?[] args) =>
         string.Format(CultureInfo.CurrentCulture, T(germanFormat), args);
 
     /// <summary>
-    /// Übersetzt die festen Texte eines Fensters (Text, Content, Header, ToolTip, Spaltenköpfe), damit die
-    /// XAML-Dateien lesbar bleiben. Aufruf direkt nach InitializeComponent.
+    /// Translates the fixed texts of a window (Text, Content, Header, ToolTip, column headers) so the
+    /// XAML files stay readable. Call right after InitializeComponent.
     /// </summary>
     public static void Translate(DependencyObject root)
     {
@@ -63,7 +63,7 @@ public static partial class L
                 case Window w:
                     w.Title = T(w.Title);
                     break;
-                // Nur bei vorhandener Übersetzung setzen – sonst gingen Hyperlinks im TextBlock verloren
+                // Only set if a translation exists – otherwise hyperlinks in the TextBlock would be lost
                 case TextBlock tb when !tb.IsBindingSet(TextBlock.TextProperty) && T(tb.Text) is var t && t != tb.Text:
                     tb.Text = t;
                     break;
@@ -96,14 +96,14 @@ public static partial class L
         return d;
     }
 
-    /// <summary>Texte aus Auswertung, Daten und Steuerelementen (Strings.Core.cs).</summary>
+    /// <summary>Texts from analysis, data and controls (Strings.Core.cs).</summary>
     static partial void AddCore(Dictionary<string, string> d);
 
-    /// <summary>Texte der Fenster (Strings.Ui.cs).</summary>
+    /// <summary>Window texts (Strings.Ui.cs).</summary>
     static partial void AddUi(Dictionary<string, string> d);
 }
 
-/// <summary>Übersetzter Text in XAML, z.B. in Vorlagen: <c>ToolTip="{l:T 'Zum Vergleich einblenden'}"</c>.</summary>
+/// <summary>Translated text in XAML, e.g. in templates: <c>ToolTip="{l:T 'Zum Vergleich einblenden'}"</c>.</summary>
 [MarkupExtensionReturnType(typeof(string))]
 public sealed class TExtension(string text) : MarkupExtension
 {

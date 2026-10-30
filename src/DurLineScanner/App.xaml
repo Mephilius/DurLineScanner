@@ -5,7 +5,7 @@
              ThemeMode="Light">
     <Application.Resources>
         <ResourceDictionary>
-            <!-- Farben, abgestimmt auf Controls/Palette.cs -->
+            <!-- Colors, matched to Controls/Palette.cs -->
             <SolidColorBrush x:Key="AppBackground" Color="#F3F3F3" />
             <SolidColorBrush x:Key="CardBackground" Color="#FFFFFF" />
             <SolidColorBrush x:Key="CardBorder" Color="#E5E5E5" />

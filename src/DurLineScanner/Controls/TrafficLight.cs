@@ -6,7 +6,7 @@ using DurLineScanner.Scanning;
 
 namespace DurLineScanner.Controls;
 
-/// <summary>Ampel (rot/gelb/grün) mit Überschrift und Begründungen; alle Begründungen auch als Tooltip.</summary>
+/// <summary>Traffic light (red/yellow/green) with headline and reasons; all reasons also as a tooltip.</summary>
 public sealed class TrafficLight : Border
 {
     private static readonly Color Housing = Color.FromRgb(0x2B, 0x2B, 0x2B);
@@ -54,10 +54,10 @@ public sealed class TrafficLight : Border
         Show(Verdict.Empty);
     }
 
-    /// <summary>Anzahl der Begründungen, die direkt angezeigt werden.</summary>
+    /// <summary>Number of reasons shown directly.</summary>
     public int VisibleReasons { get; set; } = 3;
 
-    /// <summary>Begründungen einzeilig mit Auslassungspunkten statt umbrochen (wenig Platz).</summary>
+    /// <summary>Reasons on a single line with ellipsis instead of wrapped (little space).</summary>
     public bool Compact { get; set; }
 
     public void Show(Verdict verdict)

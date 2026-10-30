@@ -1,16 +1,16 @@
-// BLE-Explorer für das DUR-line SF 4000 BT.
-// Zweck: Services/Characteristics des Geräts ermitteln und den Datenverkehr mitschneiden,
-// damit das (undokumentierte) Protokoll analysiert werden kann.
+// BLE explorer for the DUR-line SF 4000 BT.
+// Purpose: discover the device's services/characteristics and capture the traffic
+// so the (undocumented) protocol can be analyzed.
 //
-// Aufruf:
-//   BleExplorer scan [sekunden]          - BLE-Geräte in der Nähe auflisten
-//   BleExplorer classic                  - klassische Bluetooth-Geräte (SPP/RFCOMM) auflisten
-//   BleExplorer send <adresse> <hex>...  - Hex-Befehle an FF01 senden, Antworten von FF02 anzeigen
-//   BleExplorer dump <adresse>          - Services/Characteristics auflisten und lesbare Werte lesen
-//   BleExplorer monitor <adresse> [sek]  - alle Notify/Indicate abonnieren, Hex-Log, interaktiv schreiben
-//                                          (mit [sek]: nur passiv mithören, ohne Eingabe)
+// Usage:
+//   BleExplorer scan [seconds]           - list nearby BLE devices
+//   BleExplorer classic                  - list classic Bluetooth devices (SPP/RFCOMM)
+//   BleExplorer send <address> <hex>...  - send hex commands to FF01, show responses from FF02
+//   BleExplorer dump <address>          - list services/characteristics and read readable values
+//   BleExplorer monitor <address> [sec]  - subscribe to all notify/indicate, hex log, write interactively
+//                                          (with [sec]: listen passively only, no input)
 //
-// <adresse> im Format AA:BB:CC:DD:EE:FF (wird bei "scan" angezeigt).
+// <address> in the format AA:BB:CC:DD:EE:FF (shown by "scan").
 
 using System.Collections.Concurrent;
 using System.Text;
@@ -69,7 +69,7 @@ return 0;
 
 async Task Scan(int seconds)
 {
-    // Advertisement und Scan-Response kommen getrennt an; pro Adresse sammeln und nur Neues ausgeben.
+    // Advertisement and scan response arrive separately; collect per address and only print what is new.
     var seen = new ConcurrentDictionary<ulong, BleSeen>();
     var watcher = new BluetoothLEAdvertisementWatcher { ScanningMode = BluetoothLEScanningMode.Active };
     watcher.Received += (_, e) =>
@@ -105,7 +105,7 @@ async Task Scan(int seconds)
 
 async Task Send(ulong address, string[] commands)
 {
-    // Sendet Hex-Befehle an FF01 (UART-Eingang des Messgeräts) und protokolliert die Antworten von FF02.
+    // Sends hex commands to FF01 (the meter's UART input) and logs the responses from FF02.
     var serviceUuid = Guid.Parse("0000ff12-0000-1000-8000-00805f9b34fb");
     using var device = await BluetoothLEDevice.FromBluetoothAddressAsync(address)
         ?? throw new InvalidOperationException("Gerät nicht gefunden.");
@@ -130,7 +130,7 @@ async Task Send(ulong address, string[] commands)
 
 async Task ScanClassic()
 {
-    // Klassisches Bluetooth (BR/EDR), z.B. serielle SPP-Geräte. Taucht im BLE-Scan nicht auf.
+    // Classic Bluetooth (BR/EDR), e.g. serial SPP devices. Does not show up in the BLE scan.
     Log("Suche klassische Bluetooth-Geräte (dauert ca. 10-30 s) ...");
     foreach (var (label, paired) in new[] { ("gekoppelt", true), ("nicht gekoppelt", false) })
     {
@@ -205,7 +205,7 @@ async Task Dump(ulong address, bool monitor, int listenSeconds = 0)
                 }
                 catch (UnauthorizedAccessException)
                 {
-                    // z.B. 2A05 "Service Changed" - wird von Windows selbst verwaltet
+                    // e.g. 2A05 "Service Changed" - managed by Windows itself
                     Log("      Abonnieren nicht erlaubt (von Windows reserviert)");
                 }
             }

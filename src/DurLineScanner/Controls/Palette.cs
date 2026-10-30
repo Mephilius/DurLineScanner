@@ -3,7 +3,7 @@ using DurLineScanner.Scanning;
 
 namespace DurLineScanner.Controls;
 
-/// <summary>Einheitliche Farben der App (Fluent-angelehnt) für Bewertungen und Akzente.</summary>
+/// <summary>Consistent app colors (Fluent-inspired) for grades and accents.</summary>
 public static class Palette
 {
     public static readonly Color VeryBad = Color.FromRgb(0xA4, 0x26, 0x2C);

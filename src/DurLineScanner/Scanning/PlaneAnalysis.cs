@@ -2,7 +2,7 @@ using DurLineScanner.Data;
 
 namespace DurLineScanner.Scanning;
 
-/// <summary>Eine der vier Sat-ZF-Ebenen (Low/High-Band × H/V), wie sie Multischalter und Verstärker führen.</summary>
+/// <summary>One of the four sat IF planes (low/high band × H/V), as carried by multiswitches and amplifiers.</summary>
 public readonly record struct Plane(bool HighBand, Polarization Polarization)
 {
     public static readonly Plane[] All =
@@ -45,18 +45,18 @@ public enum Severity
 }
 
 /// <summary>
-/// Pegel pro Ebene über alle gelockten Transponder: zu hoch/zu niedrig, Ungleichgewicht zwischen
-/// den Ebenen (Verstärker-/Multischalter-Einstellung) und Schräglage über die Frequenz (Kabeldämpfung).
+/// Level per plane across all locked transponders: too high/too low, imbalance between
+/// the planes (amplifier/multiswitch setting) and tilt across frequency (cable attenuation).
 /// </summary>
 public static class PlaneAnalysis
 {
-    // Richtwerte für die Teilnehmerdose nach EN 60728 (DVB-S/S2): 47..77 dBµV, gut 60..70 dBµV.
-    // Der Pegel des SF 4000 ist nicht kalibriert, daher großzügig.
+    // Guideline values for the subscriber wall outlet per EN 60728 (DVB-S/S2): 47..77 dBµV, good 60..70 dBµV.
+    // The SF 4000 level is not calibrated, hence generous.
     public const double LevelTooLow = 50;
     public const double LevelLowish = 55;
     public const double LevelHigh = 77;
     public const double ImbalanceDb = 4;
-    // Der Frequenzgang des SF 4000 selbst erzeugt schon einige dB Schräglage (am LNB-Port gemessen: ±7 dB)
+    // The SF 4000's own frequency response already causes several dB of tilt (measured at the LNB port: ±7 dB)
     public const double SlopeDb = 8;
 
     private const int LofLow = 9750;
@@ -64,13 +64,13 @@ public static class PlaneAnalysis
 
     public static IReadOnlyList<PlaneStats> Analyze(ScanSession session)
     {
-        // Vermutlich abgeschaltete Transponder zählen nicht als Empfangsproblem
+        // Probably switched-off transponders do not count as a reception problem
         var raw = Plane.All
             .Select(p => Compute(p, session.Results.Where(r => Plane.Of(r) == p && !r.ProbablyInactive).ToList()))
             .ToList();
 
-        // Abweichung jeder Ebene vom Median aller Ebenen – robust, eine einzelne Ausreißer-Ebene
-        // verschiebt die Referenz der anderen nicht
+        // Deviation of each plane from the median of all planes – robust, a single outlier plane
+        // does not shift the reference of the others
         var means = raw.Where(s => s.LevelMean.HasValue).Select(s => s.LevelMean!.Value).Order().ToList();
         double? median = means.Count switch
         {
@@ -95,7 +95,7 @@ public static class PlaneAnalysis
         double? slope = null;
         if (levels.Count >= 4)
         {
-            // Lineare Regression Pegel über ZF – zeigt die Kabel-Schräglage
+            // Linear regression of level over IF – shows the cable tilt
             var xs = levels.Select(r => (double)IfOf(r)).ToArray();
             var ys = levels.Select(r => r.LevelDbuV!.Value).ToArray();
             double mx = xs.Average(), my = ys.Average();

@@ -11,7 +11,7 @@ public class AssessmentTests
     [Fact]
     public void Look_FrankfurtToAstra192()
     {
-        // Vergleichswerte üblicher Ausrichtungsrechner: Azimut ≈ 166°, Elevation ≈ 31°
+        // Reference values from common dish alignment calculators: azimuth ≈ 166°, elevation ≈ 31°
         var look = LinkBudget.Look(50.11, 8.68, 19.2);
         Assert.InRange(look.AzimuthDeg, 165, 168);
         Assert.InRange(look.ElevationDeg, 30.5, 32);
@@ -27,7 +27,7 @@ public class AssessmentTests
         var storm80 = LinkBudget.Expect(Frankfurt, 19.2, 11700, 27500, Weather.Thunderstorm);
 
         Assert.InRange(sun80.CnDb, 15, 21);
-        Assert.True(sun80.CnDb - sun60.CnDb is > 2 and < 3); // 20·log(80/60) ≈ 2,5 dB
+        Assert.True(sun80.CnDb - sun60.CnDb is > 2 and < 3); // 20·log(80/60) ≈ 2.5 dB
         Assert.True(storm80.CnDb < sun80.CnDb - 5);
         Assert.True(sun80.MerDb < LinkBudget.SatelliteMerDb);
     }
@@ -47,7 +47,7 @@ public class AssessmentTests
         StatusReading Locked(double mer) => new(StatusReading.StateLocked, 80, 80) { MerRaw = (long)(mer * 10) };
 
         Assert.Equal(Light.Green, Assessment.Live(Locked(15), tp, c).Light);
-        // genug Reserve über der Schwelle, aber weit unter der Erwartung für 80 cm → gelb
+        // enough margin above the threshold, but far below the expectation for 80 cm → yellow
         Assert.Equal(Light.Yellow, Assessment.Live(Locked(11.5), tp, c).Light);
         Assert.Equal(Light.Red, Assessment.Live(Locked(8.0), tp, c).Light);
     }
@@ -66,10 +66,10 @@ public class AssessmentTests
         var good = Session(mer: 15, holes: 0);
         Assert.Equal(Light.Green, Assessment.Scan(good).Light);
 
-        // 8PSK 3/4 braucht 7,9 dB – 10 dB ist Reserve 2,1 dB → gelb
+        // 8PSK 3/4 needs 7.9 dB – 10 dB is a margin of 2.1 dB → yellow
         Assert.Equal(Light.Yellow, Assessment.Scan(Session(mer: 10, holes: 0)).Light);
         Assert.Equal(Light.Red, Assessment.Scan(Session(mer: 8.2, holes: 0)).Light);
-        // 3 von 20 ohne Lock → mehr als 10 % → rot
+        // 3 of 20 without lock → more than 10 % → red
         Assert.Equal(Light.Red, Assessment.Scan(Session(mer: 15, holes: 3)).Light);
     }
 
@@ -100,7 +100,7 @@ public class AssessmentTests
                 TuneAccepted = true,
                 Locked = locked,
                 MerDb = locked ? mer : null,
-                // Löcher mit schwachem Pegel, damit sie nicht als abgeschaltet gelten
+                // Holes with a weak level so they don't count as switched off
                 LevelDbuV = locked ? 65 : 45,
             });
         }

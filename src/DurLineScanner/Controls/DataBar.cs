@@ -4,7 +4,7 @@ using System.Windows.Media;
 
 namespace DurLineScanner.Controls;
 
-/// <summary>Datenbalken für Tabellenzellen: farbiger Balken proportional zum Wert, Zahl daneben.</summary>
+/// <summary>Data bar for table cells: colored bar proportional to the value, number next to it.</summary>
 public sealed class DataBar : FrameworkElement
 {
     public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(

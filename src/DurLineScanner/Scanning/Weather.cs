@@ -35,9 +35,9 @@ public static class WeatherInfo
     };
 
     /// <summary>
-    /// Typische Zusatzdämpfung im Ku-Band bei 30° Elevation in dB. Grobe Richtwerte (ITU-R P.618/P.840):
-    /// Wolken einige Zehntel dB, Regen 1–2 dB, nasser Schnee auf Schüssel und LNB-Abdeckung 2–3 dB,
-    /// Starkregen bei Gewitter 5 dB und mehr.
+    /// Typical extra attenuation in Ku band at 30° elevation in dB. Rough guideline values (ITU-R P.618/P.840):
+    /// clouds a few tenths of a dB, rain 1–2 dB, wet snow on dish and LNB cover 2–3 dB,
+    /// heavy rain in thunderstorms 5 dB and more.
     /// </summary>
     public static double FadeDb(Weather w) => w switch
     {
@@ -49,11 +49,11 @@ public static class WeatherInfo
         _ => 5,
     };
 
-    /// <summary>Wetter, bei dem Dämpfung durch Niederschlag schon in der Messung steckt.</summary>
+    /// <summary>Weather where attenuation from precipitation is already included in the measurement.</summary>
     public static bool IsWet(Weather w) => w is Weather.Rain or Weather.Snow or Weather.Thunderstorm;
 }
 
-/// <summary>Auswahl in der Oberfläche.</summary>
+/// <summary>Selection item in the UI.</summary>
 public sealed record WeatherOption(Weather Weather)
 {
     public override string ToString() => $"{WeatherInfo.Icon(Weather)}  {WeatherInfo.Text(Weather)}";

@@ -1,6 +1,6 @@
-; Inno-Setup-Skript für den DUR-line Scanner
-; Aufruf (siehe .github/workflows/release.yml):
-;   ISCC.exe /DAppVersion=1.0.0 /DSourceDir=<publish-Ordner> DurLineScanner.iss
+; Inno Setup script for the DUR-line Scanner
+; Usage (see .github/workflows/release.yml):
+;   ISCC.exe /DAppVersion=1.0.0 /DSourceDir=<publish folder> DurLineScanner.iss
 
 #ifndef AppVersion
   #define AppVersion "0.0.0"
@@ -22,7 +22,7 @@ AppCopyright=© 2026 DUR-line Scanner contributors, GPL-3.0
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
-; Ohne Adminrechte für den aktuellen Benutzer installierbar, wahlweise für alle
+; Installable for the current user without admin rights, optionally for all users
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 ArchitecturesAllowed=x64compatible
@@ -47,7 +47,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
-; Verknüpfungen aus Versionen bis 0.9.1 (damals „DurLine Scanner“ geschrieben)
+; Shortcuts from versions up to 0.9.1 (spelled "DurLine Scanner" back then)
 Type: files; Name: "{autoprograms}\DurLine Scanner.lnk"
 Type: files; Name: "{autoprograms}\DurLine Scanner – Benutzerhandbuch.lnk"
 Type: files; Name: "{autoprograms}\DurLine Scanner – User guide.lnk"
@@ -62,4 +62,4 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExe}"; Tasks: desktopico
 [Run]
 Filename: "{app}\{#AppExe}"; Description: "{cm:LaunchProgram,{#AppName}}"; Flags: nowait postinstall skipifsilent
 
-; Messreihen (Dokumente\DurLineScanner) und Einstellungen (%AppData%\DurLineScanner) bleiben beim Deinstallieren erhalten.
+; Measurement series (Documents\DurLineScanner) and settings (%AppData%\DurLineScanner) are kept on uninstall.

@@ -4,7 +4,7 @@ namespace DurLineScanner.Tests;
 
 public class ChannelListTests
 {
-    // Aufbau wie eine Enigma2-lamedb (Format 4); Werte angelehnt an Astra 19,2° O
+    // Structured like an Enigma2 lamedb (format 4); values modeled on Astra 19.2° E
     private const string LamedbV4 = """
         eDVB services /4/
         transponders
@@ -74,7 +74,7 @@ public class ChannelListTests
         var zdf = all.Single(c => c.Channel.Name == "ZDF HD");
         Assert.Equal(11494, zdf.FrequencyMHz);
         Assert.Equal(Polarization.Horizontal, zdf.Pol);
-        Assert.Equal("Bayern 3", all[0].Channel.Name); // alphabetisch
+        Assert.Equal("Bayern 3", all[0].Channel.Name); // alphabetical
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class ChannelListTests
         Assert.DoesNotContain("geheim", s.ReceiverPasswordProtected);
         Assert.NotEmpty(s.ReceiverPasswordProtected);
 
-        // Wie nach dem Speichern und erneuten Laden: nur der verschlüsselte Wert wird übernommen
+        // As after saving and reloading: only the encrypted value is carried over
         var reloaded = new AppSettings { ReceiverPasswordProtected = s.ReceiverPasswordProtected };
         Assert.Equal("geheim123", reloaded.ReceiverPassword);
         Assert.Equal(9, reloaded.ReceiverPassword.Length);

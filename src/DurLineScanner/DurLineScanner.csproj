@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <!-- Windows-SDK-Version wird für die WinRT-Bluetooth-LE-APIs benötigt -->
+    <!-- Windows SDK version is required for the WinRT Bluetooth LE APIs -->
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <AssemblyTitle>DUR-line Scanner</AssemblyTitle>
-    <!-- Lokale Builds; der Release-Workflow setzt die Version aus dem Tag (-p:Version=…) -->
+    <!-- Local builds; the release workflow sets the version from the tag (-p:Version=…) -->
     <Version>0.0.0-dev</Version>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <!-- Fluent-Theme (Application.ThemeMode) ist in .NET noch als experimentell markiert -->
+    <!-- Fluent theme (Application.ThemeMode) is still marked experimental in .NET -->
     <NoWarn>$(NoWarn);WPF0001</NoWarn>
   </PropertyGroup>
 
@@ -21,12 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Programmsymbol: Sat-Schüssel mit Signalbögen in Ampelfarben -->
+    <!-- App icon: satellite dish with signal arcs in traffic light colors -->
     <Resource Include="Assets\app.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Hilfe: Handbücher und Lizenz sind ins Programm eingebettet und passen so immer zur Version -->
+    <!-- Help: user guides and license are embedded in the app so they always match the version -->
     <EmbeddedResource Include="..\..\docs\BENUTZERHANDBUCH.md" LogicalName="Help.BENUTZERHANDBUCH.md" />
     <EmbeddedResource Include="..\..\docs\USER_GUIDE.md" LogicalName="Help.USER_GUIDE.md" />
     <EmbeddedResource Include="..\..\LICENSE" LogicalName="Help.LICENSE" />

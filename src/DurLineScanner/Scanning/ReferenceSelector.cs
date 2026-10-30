@@ -1,9 +1,9 @@
 namespace DurLineScanner.Scanning;
 
 /// <summary>
-/// Wählt pro Ebene den Transponder, der sich am besten als Referenz für die Live-Pegelmessung eignet:
-/// sicherer Lock, hohe MER, Pegel nahe am Ebenen-Median (also kein Ausreißer) und ZF in der Bandmitte,
-/// damit die Kabel-Schräglage den Wert nicht verfälscht.
+/// Picks, per plane, the transponder best suited as reference for live level measurement:
+/// reliable lock, high MER, level close to the plane median (i.e. no outlier) and IF in mid-band,
+/// so the cable tilt does not skew the value.
 /// </summary>
 public static class ReferenceSelector
 {
@@ -25,9 +25,9 @@ public static class ReferenceSelector
     public static double Score(ScanResult r, Plane plane, double medianLevel)
     {
         double ifMHz = r.FrequencyMHz - (plane.HighBand ? 10600 : 9750);
-        return r.MerDb!.Value                                   // Hauptkriterium: sauberes Signal
-               - 0.5 * Math.Abs(r.LevelDbuV!.Value - medianLevel) // repräsentativ für die Ebene
-               - Math.Abs(ifMHz - IfCenterMHz) / 300             // Bandmitte bevorzugen
-               - Math.Min(r.LockTimeSeconds ?? 0, 5) * 0.3;      // schneller Lock = stabil
+        return r.MerDb!.Value                                   // main criterion: clean signal
+               - 0.5 * Math.Abs(r.LevelDbuV!.Value - medianLevel) // representative of the plane
+               - Math.Abs(ifMHz - IfCenterMHz) / 300             // prefer mid-band
+               - Math.Min(r.LockTimeSeconds ?? 0, 5) * 0.3;      // fast lock = stable
     }
 }

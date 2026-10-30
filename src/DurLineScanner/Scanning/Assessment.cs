@@ -11,22 +11,22 @@ public enum Light
     Red,
 }
 
-/// <summary>Ampel-Ergebnis mit Überschrift und Begründungen.</summary>
+/// <summary>Traffic-light result with headline and reasons.</summary>
 public sealed record Verdict(Light Light, string Headline, IReadOnlyList<string> Reasons)
 {
     public static readonly Verdict Empty = new(Light.None, L.T("Noch keine Messung"), []);
 }
 
-/// <summary>Messbedingungen: Standort (Schüssel, LNB, Koordinaten), Wetter und Satellit.</summary>
+/// <summary>Measurement conditions: site (dish, LNB, coordinates), weather and satellite.</summary>
 public sealed record Conditions(Site? Site, Weather? Weather, double SatelliteLongitude);
 
 /// <summary>
-/// Ampel für Live-Werte und Scans. Bewertet die MER-Reserve über der Empfangsschwelle, die Reserve für
-/// schlechteres Wetter und – mit Standortdaten – die gemessene MER gegen die Erwartung aus dem Linkbudget.
+/// Traffic light for live values and scans. Rates the MER margin above the reception threshold, the margin for
+/// worse weather and – with site data – the measured MER against the expectation from the link budget.
 /// </summary>
 public static class Assessment
 {
-    /// <summary>Ab so viel dB unter der Erwartung gilt die Anlage als verbesserungswürdig bzw. gestört.</summary>
+    /// <summary>From this many dB below the expectation the system counts as needing improvement or faulty.</summary>
     public const double DeficitYellowDb = 4;
     public const double DeficitRedDb = 8;
 
@@ -70,7 +70,7 @@ public static class Assessment
         var locked = relevant.Where(r => r.Locked && r.MerDb.HasValue).ToList();
         if (locked.Count > 0)
         {
-            // Typischer Transponder für Reserve und Erwartung, schwache gesondert
+            // Typical transponder for margin and expectation, weak ones separately
             var margins = locked.Select(r => r.MerDb!.Value - r.Threshold.Db).Order().ToList();
             var typical = locked.OrderBy(r => r.MerDb!.Value - r.Threshold.Db).ElementAt(locked.Count / 2);
             CheckSignal(builder, typical.MerDb!.Value, typical.Threshold.Db, L.T("Median aller Transponder"),
@@ -108,7 +108,7 @@ public static class Assessment
         else
             b.Info(L.F("Erwartung für {0} cm bei „{1}“: ca. {2:0.0} dB – erreicht.", site.DishCm, WeatherInfo.Text(weather), expected.MerDb));
 
-        // Reserve für schlechteres Wetter
+        // Margin for worse weather
         if (!WeatherInfo.IsWet(weather))
         {
             double rain = LinkBudget.ExtraLossDb(site, c.SatelliteLongitude, freq, sr, weather, Weather.Rain);
@@ -144,7 +144,7 @@ public static class Assessment
                 Light.Yellow => L.T("Empfang verbesserungswürdig"),
                 _ => L.T("Empfang in Ordnung"),
             } + weather;
-            // Probleme zuerst, dann Hinweise
+            // Problems first, then hints
             var reasons = _items.OrderByDescending(i => i.Light).Select(i => i.Text).Distinct().ToList();
             return new Verdict(light, headline, reasons);
         }

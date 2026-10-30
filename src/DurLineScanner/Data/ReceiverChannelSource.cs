@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 namespace DurLineScanner.Data;
 
 /// <summary>
-/// Lädt die Senderliste online vom eigenen Receiver:
-/// Enigma2 über OpenWebif (/file?file=/etc/enigma2/lamedb5, sonst lamedb, notfalls per FTP),
-/// TVHeadend über die JSON-API (Muxe und Services).
+/// Loads the channel list online from your own receiver:
+/// Enigma2 via OpenWebif (/file?file=/etc/enigma2/lamedb5, else lamedb, falling back to FTP),
+/// TVHeadend via the JSON API (muxes and services).
 /// </summary>
 public static partial class ReceiverChannelSource
 {
@@ -23,7 +23,7 @@ public static partial class ReceiverChannelSource
 
     public static Uri BaseUri(AppSettings settings)
     {
-        // Schema und Port kommen aus eigenen Feldern; die Adresse ist nur Name/IP, optional mit Pfad
+        // Scheme and port come from separate fields; the address is only name/IP, optionally with a path
         var address = settings.ReceiverAddress.Trim().Trim('/');
         int slash = address.IndexOf('/');
         var uri = new UriBuilder(
@@ -39,7 +39,7 @@ public static partial class ReceiverChannelSource
         var handler = new HttpClientHandler();
         if (settings.ReceiverUser.Length > 0)
         {
-            // CredentialCache beantwortet Basic- und Digest-Anmeldung (TVHeadend nutzt Digest)
+            // CredentialCache answers Basic and Digest authentication (TVHeadend uses Digest)
             var credential = new NetworkCredential(settings.ReceiverUser, settings.ReceiverPassword);
             handler.Credentials = new CredentialCache
             {
@@ -75,12 +75,12 @@ public static partial class ReceiverChannelSource
                 catch (HttpRequestException ex)
                 {
                     errors.Add(ex.Message);
-                    break; // Receiver nicht erreichbar – FTP versuchen
+                    break; // receiver unreachable – try FTP
                 }
             }
         }
 
-        // Manche OpenWebif-Versionen sperren den Dateizugriff – dann direkt per FTP (Benutzer root)
+        // Some OpenWebif versions block file access – then use FTP directly (user root)
         try
         {
             return ChannelList.ImportText(await FtpDownloadAsync(settings, baseUri.Host, "/etc/enigma2/lamedb", ct), source);
@@ -92,7 +92,7 @@ public static partial class ReceiverChannelSource
         throw new InvalidOperationException(L.F("Senderliste nicht erhalten ({0}).", string.Join("; ", errors)));
     }
 
-#pragma warning disable SYSLIB0014 // FtpWebRequest ist veraltet, aber die einfachste Möglichkeit ohne Zusatzpaket
+#pragma warning disable SYSLIB0014 // FtpWebRequest is obsolete, but the simplest option without an extra package
     private static async Task<string> FtpDownloadAsync(AppSettings settings, string host, string file, CancellationToken ct)
     {
         var request = (FtpWebRequest)WebRequest.Create($"ftp://{host}{file}");
@@ -126,12 +126,12 @@ public static partial class ReceiverChannelSource
             {
                 "H" => Polarization.Horizontal,
                 "V" => Polarization.Vertical,
-                _ => (Polarization?)null, // zirkular oder kein Sat-Mux
+                _ => (Polarization?)null, // circular or not a satellite mux
             };
             if (pol is null || Num(mux, "frequency") is not { } freq) continue;
             int? position = ParseOrbital(Str(mux, "orbital")) ?? ParseOrbital(Str(mux, "network"));
             if (position is null) continue;
-            // TVHeadend speichert DVB-S-Frequenzen in kHz
+            // TVHeadend stores DVB-S frequencies in kHz
             int mhz = (int)Math.Round(freq > 1e8 ? freq / 1e6 : freq > 1e5 ? freq / 1e3 : freq);
             int sr = (int)Math.Round((Num(mux, "symbolrate") ?? 27500000) / 1000);
             muxes[uuid] = (position.Value, mhz, pol.Value, sr);
@@ -186,7 +186,7 @@ public static partial class ReceiverChannelSource
     private static double? Num(JsonElement e, string name) =>
         e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.Number ? v.GetDouble() : null;
 
-    /// <summary>"19.2E", "19,2° Ost", "Astra 19.2E", "0.8W" → Zehntelgrad, West negativ.</summary>
+    /// <summary>"19.2E", "19,2° Ost", "Astra 19.2E", "0.8W" → tenths of a degree, west negative.</summary>
     internal static int? ParseOrbital(string? text)
     {
         if (text is null) return null;

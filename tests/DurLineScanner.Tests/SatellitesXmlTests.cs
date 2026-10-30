@@ -4,7 +4,7 @@ namespace DurLineScanner.Tests;
 
 public class SatellitesXmlTests
 {
-    // Ausschnitt aus der OpenPLi-Datei vom 27.10.2026
+    // Excerpt from the OpenPLi file of 2026-10-27
     private const string Sample = """
         <?xml version="1.0" encoding="UTF-8"?>
         <!--
@@ -34,14 +34,14 @@ public class SatellitesXmlTests
             Assert.Equal("satellites.xml vom 27.10.2026", xml.Description);
             Assert.Equal(2, xml.SatelliteCount);
 
-            // 19,2° als 192 – auch 193 muss noch passen (±0,2°)
+            // 19.2° as 192 – 193 must still match too (±0.2°)
             var astra = xml.GetTransponders(193)!;
             Assert.Equal(3, astra.Count);
             Assert.Equal(new Transponder(10729, Polarization.Vertical, 23500, "DVB-S2", "8PSK", "3/4"), astra[0]);
             Assert.Equal(Polarization.Horizontal, astra[2].Polarization);
             Assert.Equal(10714, astra[2].FrequencyMHz);
 
-            // Zirkulare Polarisation wird übersprungen – NSS 9 hat dann keinen empfangbaren Transponder
+            // Circular polarization is skipped – NSS 9 then has no receivable transponder
             Assert.Null(xml.GetTransponders(-1770));
             var sat = Assert.Single(xml.Satellites);
             Assert.Equal(new Satellite(1920, "19.2E Astra 1N/1P", 9750, 10600, 19.2), sat);

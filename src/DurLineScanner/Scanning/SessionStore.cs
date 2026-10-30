@@ -6,7 +6,7 @@ using DurLineScanner.Data;
 
 namespace DurLineScanner.Scanning;
 
-/// <summary>Speichert Messreihen als JSON unter Dokumente\DurLineScanner\Messungen.</summary>
+/// <summary>Stores measurement series as JSON under Documents\DurLineScanner\Messungen.</summary>
 public sealed class SessionStore
 {
     internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -44,13 +44,13 @@ public sealed class SessionStore
             }
             catch (JsonException)
             {
-                // Beschädigte Datei überspringen
+                // Skip corrupt file
             }
             if (session is not null) yield return (path, session);
         }
     }
 
-    /// <summary>CSV mit Semikolon und deutschem Dezimalkomma, damit Excel es direkt öffnet.</summary>
+    /// <summary>CSV with semicolons and German decimal comma, so Excel opens it directly.</summary>
     public static void ExportCsv(ScanSession session, string path)
     {
         var culture = CultureInfo.GetCultureInfo("de-DE");

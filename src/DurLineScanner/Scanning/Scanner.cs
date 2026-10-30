@@ -6,17 +6,17 @@ namespace DurLineScanner.Scanning;
 
 public sealed class ScanOptions
 {
-    /// <summary>Wartezeit nach dem Einstellen, bevor die erste Abfrage kommt.</summary>
+    /// <summary>Wait time after tuning before the first query.</summary>
     public TimeSpan SettleTime { get; set; } = TimeSpan.FromMilliseconds(800);
 
-    /// <summary>Maximale Zeit bis zum Lock; danach gilt der Transponder als nicht empfangbar.</summary>
+    /// <summary>Maximum time to lock; after that the transponder counts as not receivable.</summary>
     public TimeSpan LockTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
-    /// <summary>Anzahl gelockter Messungen, die gemittelt werden.</summary>
+    /// <summary>Number of locked readings that are averaged.</summary>
     public int LockedSamples { get; set; } = 2;
 }
 
-/// <summary>Fährt eine Transponderliste ab und misst jeden Transponder.</summary>
+/// <summary>Walks through a transponder list and measures each transponder.</summary>
 public sealed class Scanner(Sf4000Client client, ScanOptions options)
 {
     public async Task<ScanResult> MeasureAsync(Transponder tp, Satellite satellite, CancellationToken ct)
@@ -67,7 +67,7 @@ public sealed class Scanner(Sf4000Client client, ScanOptions options)
             }
             else if (locked.Count > 0)
             {
-                // Lock wieder verloren: instabiler Empfang, bisherige Werte reichen
+                // Lock lost again: unstable reception, the values so far are enough
                 break;
             }
         }
@@ -113,7 +113,7 @@ public sealed class Scanner(Sf4000Client client, ScanOptions options)
             }
             catch (Exception ex) when (ex is TimeoutException or InvalidOperationException)
             {
-                // Detailmodus bleibt an; stört beim nächsten Verbinden nicht
+                // Detail mode stays on; does no harm on the next connect
             }
         }
     }

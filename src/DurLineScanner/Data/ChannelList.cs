@@ -24,7 +24,7 @@ public sealed record Channel(string Name, string Provider, ChannelKind Kind, boo
     };
 }
 
-/// <summary>Sender mit seinem Transponder – für die Senderauswahl in der Live-Messung.</summary>
+/// <summary>Channel with its transponder – for channel selection in the live measurement.</summary>
 public sealed record ChannelOnTransponder(Channel Channel, int FrequencyMHz, Polarization Pol)
 {
     public override string ToString() =>
@@ -32,16 +32,16 @@ public sealed record ChannelOnTransponder(Channel Channel, int FrequencyMHz, Pol
 }
 
 /// <summary>
-/// Senderliste aus einer Enigma2-<c>lamedb</c> (Format 4 oder 5), z.B. vom eigenen Receiver
-/// (/etc/enigma2/lamedb) oder aus einem Senderlisten-Paket (ZIP).
+/// Channel list from an Enigma2 <c>lamedb</c> (format 4 or 5), e.g. from your own receiver
+/// (/etc/enigma2/lamedb) or from a channel list package (ZIP).
 /// </summary>
 public sealed class ChannelList
 {
-    /// <summary>Gespeicherte Senderliste; in Tests auf eine temporäre Datei umstellbar.</summary>
+    /// <summary>Saved channel list; can be redirected to a temporary file in tests.</summary>
     public static string UserCopyPath { get; internal set; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DurLineScanner", "lamedb");
 
-    /// <summary>Aktuell geladene Liste (für Tooltips in der Tabelle).</summary>
+    /// <summary>Currently loaded list (for tooltips in the table).</summary>
     public static ChannelList? Current { get; set; } = TryLoadUserCopy();
 
     private readonly List<(int Position, int FrequencyMHz, Polarization Pol, List<Channel> Channels)> _transponders;
@@ -56,7 +56,7 @@ public sealed class ChannelList
 
     public int ChannelCount => _transponders.Sum(t => t.Channels.Count);
 
-    /// <summary>Programme eines Transponders; Position in Zehntelgrad (West negativ), Frequenz ±2 MHz.</summary>
+    /// <summary>Channels of a transponder; position in tenths of a degree (west negative), frequency ±2 MHz.</summary>
     public IReadOnlyList<Channel> Get(int positionTenths, int frequencyMHz, Polarization pol) =>
         _transponders
             .Where(t => t.Pol == pol && Math.Abs(t.FrequencyMHz - frequencyMHz) <= 2 && Math.Abs(t.Position - positionTenths) <= 2)
@@ -65,7 +65,7 @@ public sealed class ChannelList
             .DistinctBy(c => (c.Name, c.Kind))
             .ToList();
 
-    /// <summary>Alle Sender einer Orbitposition mit ihrem Transponder, alphabetisch.</summary>
+    /// <summary>All channels of an orbital position with their transponder, alphabetically.</summary>
     public IReadOnlyList<ChannelOnTransponder> AllAt(int positionTenths) =>
         _transponders
             .Where(t => Math.Abs(t.Position - positionTenths) <= 2)
@@ -87,15 +87,15 @@ public sealed class ChannelList
         }
     }
 
-    /// <summary>Übernimmt eine lamedb oder ein ZIP mit lamedb als Benutzerkopie.</summary>
+    /// <summary>Adopts a lamedb or a ZIP containing a lamedb as the user copy.</summary>
     public static ChannelList Import(string path) => ImportText(ReadLamedb(path), null);
 
-    /// <summary>Prüft eine lamedb und speichert sie als Benutzerkopie, optional mit Herkunft für die Anzeige.</summary>
+    /// <summary>Validates a lamedb and saves it as the user copy, optionally with its source for display.</summary>
     public static ChannelList ImportText(string text, string? source)
     {
         if (source is not null)
         {
-            // Herkunft als Kommentar hinter der Kopfzeile; beide Formate ignorieren solche Zeilen
+            // Source as a comment after the header line; both formats ignore such lines
             int lineEnd = text.IndexOf('\n');
             text = lineEnd < 0 ? text : text[..(lineEnd + 1)] + $"{SourcePrefix}{source}\n" + text[(lineEnd + 1)..];
         }
@@ -107,14 +107,14 @@ public sealed class ChannelList
 
     private const string SourcePrefix = "# Quelle: ";
 
-    /// <summary>Liste aus Einzeldaten (z.B. TVHeadend) als lamedb5-Text, damit sie wie eine importierte Liste gespeichert wird.</summary>
+    /// <summary>List from individual records (e.g. TVHeadend) as lamedb5 text, so it is saved like an imported list.</summary>
     public static string ToLamedb5(IEnumerable<(int PositionTenths, int FrequencyMHz, Polarization Pol, int SymbolRateKs, Channel Channel)> entries)
     {
         var sb = new System.Text.StringBuilder("eDVB services /5/\n");
         int tsid = 0, sid = 0;
         foreach (var tp in entries.GroupBy(e => (e.PositionTenths, e.FrequencyMHz, e.Pol)))
         {
-            // Künstliche Schlüssel: Namespace aus der Position, Transport-ID fortlaufend
+            // Synthetic keys: namespace from the position, sequential transport ID
             int pos = tp.Key.PositionTenths < 0 ? 3600 + tp.Key.PositionTenths : tp.Key.PositionTenths;
             string key = $"{pos << 16:x8}:{++tsid:x4}:0001";
             sb.Append($"t:{key},s:{tp.Key.FrequencyMHz * 1000}:{tp.First().SymbolRateKs * 1000}:{(tp.Key.Pol == Polarization.Horizontal ? 0 : 1)}:0:{pos}:2:0\n");
@@ -141,7 +141,7 @@ public sealed class ChannelList
         if (!path.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) return File.ReadAllText(path);
 
         using var zip = ZipFile.OpenRead(path);
-        // lamedb5 bevorzugen, sonst lamedb – egal in welchem Unterordner
+        // Prefer lamedb5, else lamedb – in any subfolder
         var entry = zip.Entries.FirstOrDefault(e => e.Name.Equals("lamedb5", StringComparison.OrdinalIgnoreCase))
                     ?? zip.Entries.FirstOrDefault(e => e.Name.Equals("lamedb", StringComparison.OrdinalIgnoreCase))
                     ?? throw new InvalidDataException(L.T("Im ZIP wurde keine lamedb gefunden."));
@@ -155,7 +155,7 @@ public sealed class ChannelList
         if (lines.Length == 0 || !lines[0].StartsWith("eDVB services /"))
             throw new InvalidDataException(L.T("Keine Enigma2-lamedb (erste Zeile muss „eDVB services /4/“ oder „/5/“ sein)."));
 
-        // Transponder-Schlüssel "namespace:tsid:onid" → (Position, Frequenz, Polarisation)
+        // Transponder key "namespace:tsid:onid" → (position, frequency, polarization)
         var transponders = new Dictionary<string, (int Position, int FrequencyMHz, Polarization Pol)>(StringComparer.OrdinalIgnoreCase);
         var services = new List<(string Key, Channel Channel)>();
 
@@ -190,7 +190,7 @@ public sealed class ChannelList
             string key = lines[i].Trim();
             string data = i + 1 < lines.Length ? lines[i + 1].Trim() : "";
             if (ParseSatTransponder(data) is { } tp) transponders[NormalizeKey(key)] = tp;
-            i += 3; // Schlüssel, Daten, "/"
+            i += 3; // key, data, "/"
         }
 
         i = Array.IndexOf(lines, "services") + 1;
@@ -198,7 +198,7 @@ public sealed class ChannelList
         {
             if (ParseServiceHeader(lines[i]) is { } header)
                 services.Add((header.Key, MakeChannel(lines[i + 1], lines[i + 2], header.Type)));
-            i += 3; // Kopf, Name, Provider
+            i += 3; // header, name, provider
         }
     }
 
@@ -231,15 +231,15 @@ public sealed class ChannelList
         }
     }
 
-    /// <summary>"s freq:sr:pol:fec:pos:…" (v4, mit Tab/"s ") bzw. "s:freq:…" (v5).</summary>
+    /// <summary>"s freq:sr:pol:fec:pos:…" (v4, with tab/"s ") or "s:freq:…" (v5).</summary>
     private static (int Position, int FrequencyMHz, Polarization Pol)? ParseSatTransponder(string data)
     {
         if (data.Length < 3 || data[0] != 's' || (data[1] != ' ' && data[1] != ':')) return null;
         var f = data[2..].Split(':');
         if (f.Length < 5 || !int.TryParse(f[0], out int freq) || !int.TryParse(f[2], out int pol) || !int.TryParse(f[4], out int pos))
             return null;
-        if (pol is not (0 or 1)) return null; // zirkular
-        // lamedb speichert West als 3600 - x
+        if (pol is not (0 or 1)) return null; // circular
+        // lamedb stores west as 3600 - x
         if (pos > 1800) pos -= 3600;
         return (pos, (int)Math.Round(freq / 1000.0), pol == 0 ? Polarization.Horizontal : Polarization.Vertical);
     }
@@ -253,7 +253,7 @@ public sealed class ChannelList
 
     private static string NormalizeKey(string key)
     {
-        // Schlüssel als Zahlen vergleichen, führende Nullen unterscheiden sich je nach Erzeuger
+        // Compare keys as numbers; leading zeros differ depending on the generator
         var parts = key.Split(':');
         return string.Join(":", parts.Select(p => long.TryParse(p, NumberStyles.HexNumber, null, out var v) ? v.ToString("x") : p));
     }

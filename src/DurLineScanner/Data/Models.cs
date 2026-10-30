@@ -6,15 +6,15 @@ public enum Polarization
     Vertical,
 }
 
-/// <summary>Satellit mit LNB-Oszillatorfrequenzen (MHz).</summary>
+/// <summary>Satellite with LNB oscillator frequencies (MHz).</summary>
 public sealed record Satellite(int Id, string Name, int LofLow, int LofHigh, double Longitude)
 {
     public override string ToString() => Name;
 }
 
 /// <summary>
-/// Transponder: Frequenz in MHz, Symbolrate in kSym/s. System/Modulation nur bekannt, wenn die Liste
-/// aus einer satellites.xml stammt (ältere Messreihen enthalten sie nicht).
+/// Transponder: frequency in MHz, symbol rate in kSym/s. System/modulation only known if the list
+/// comes from a satellites.xml (older measurement series do not contain them).
 /// </summary>
 public sealed record Transponder(
     int FrequencyMHz,

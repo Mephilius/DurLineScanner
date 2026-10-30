@@ -1,7 +1,7 @@
 name: Release
 
-# Ein Tag wie v1.0.0 baut Setup und portable ZIP und legt ein GitHub-Release an.
-# Manuell gestartet entstehen nur die Artefakte (ohne Release).
+# A tag like v1.0.0 builds the setup and portable ZIP and creates a GitHub release.
+# A manual run only produces the artifacts (no release).
 on:
   push:
     tags: ['v*']
@@ -75,7 +75,7 @@ jobs:
         with:
           name: DUR-line Scanner ${{ steps.version.outputs.version }}
           generate_release_notes: true
-          # Versionen unter 1.0 und Tags mit Zusatz (z.B. v1.1.0-beta) als Vorabversion
+          # Versions below 1.0 and tags with a suffix (e.g. v1.1.0-beta) as pre-release
           prerelease: ${{ startsWith(steps.version.outputs.version, '0.') || contains(steps.version.outputs.version, '-') }}
           files: |
             publish/*.exe

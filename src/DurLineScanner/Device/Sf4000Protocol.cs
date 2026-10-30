@@ -3,7 +3,7 @@ using DurLineScanner.Data;
 namespace DurLineScanner.Device;
 
 /// <summary>
-/// Befehlskodierung und Antwortauswertung des SF 4000 BT. Details: docs/PROTOKOLL.md.
+/// Command encoding and response parsing for the SF 4000 BT. Details: docs/PROTOKOLL.md.
 /// </summary>
 public static class Sf4000Protocol
 {
@@ -23,8 +23,8 @@ public static class Sf4000Protocol
     public static byte[] Command(byte code, params byte[] payload) => [Prefix, code, .. payload];
 
     /// <summary>
-    /// Ermittelt 22-kHz-Band und ZF für Universal- bzw. C-Band-LNB.
-    /// Gibt null zurück, wenn der Transponder mit diesem LNB nicht empfangbar ist.
+    /// Determines the 22 kHz band and IF for a universal or C-band LNB.
+    /// Returns null if the transponder cannot be received with this LNB.
     /// </summary>
     public static (bool HighBand, int IfMHz)? GetBandAndIf(int frequencyMHz, int lofLow, int lofHigh)
     {
@@ -32,7 +32,7 @@ public static class Sf4000Protocol
 
         if (lofHigh < 8000)
         {
-            // C-Band: ZF = LOF - Frequenz
+            // C band: IF = LOF - frequency
             if (InRange(lofLow - frequencyMHz)) return (false, lofLow - frequencyMHz);
             if (InRange(lofHigh - frequencyMHz)) return (lofHigh != lofLow, lofHigh - frequencyMHz);
             return null;
@@ -50,7 +50,7 @@ public static class Sf4000Protocol
     }
 
     /// <summary>
-    /// A5F2 + 4 Byte: Bit31 Pol (1 = H), Bit30 22 kHz, Bit29..16 ZF (MHz), Bit15..0 Symbolrate (kS/s).
+    /// A5F2 + 4 bytes: bit31 pol (1 = H), bit30 22 kHz, bit29..16 IF (MHz), bit15..0 symbol rate (kS/s).
     /// </summary>
     public static byte[]? EncodeTune(Transponder tp, int lofLow, int lofHigh)
     {
@@ -65,14 +65,14 @@ public static class Sf4000Protocol
         return Command(CmdTune, (byte)(word >> 24), (byte)(word >> 16), (byte)(word >> 8), (byte)word);
     }
 
-    /// <summary>Wertet eine A5F3-Antwort aus (3 oder 15 Nutzbytes).</summary>
+    /// <summary>Parses an A5F3 response (3 or 15 payload bytes).</summary>
     public static StatusReading? ParseStatus(ReadOnlySpan<byte> data)
     {
         if (data.Length < 5 || data[0] != Prefix || data[1] != CmdStatus) return null;
         var reading = new StatusReading(data[2], data[3], data[4]);
         if (data.Length >= 17)
         {
-            // Detailwerte: die letzten 12 Bytes, big-endian
+            // Detail values: the last 12 bytes, big-endian
             var d = data[^12..];
             reading = reading with
             {
@@ -89,7 +89,7 @@ public static class Sf4000Protocol
         ((long)b[0] << 24) | ((long)b[1] << 16) | ((long)b[2] << 8) | b[3];
 }
 
-/// <summary>Messwerte einer A5F3-Abfrage. Umrechnungen in Anzeigewerte wie am Gerät.</summary>
+/// <summary>Readings of an A5F3 query. Conversions to display values as on the device.</summary>
 public sealed record StatusReading(byte State, int StrengthRaw, int Quality)
 {
     public const byte StateNoTransponder = 0x01;
@@ -103,7 +103,7 @@ public sealed record StatusReading(byte State, int StrengthRaw, int Quality)
 
     public bool IsLocked => State == StateLocked;
 
-    /// <summary>Signalstärke in %, mit bereichsabhängigem Korrekturaufschlag.</summary>
+    /// <summary>Signal strength in %, with a range-dependent correction offset.</summary>
     public int StrengthPercent
     {
         get
@@ -127,7 +127,7 @@ public sealed record StatusReading(byte State, int StrengthRaw, int Quality)
 
     public double? MerDb => MerRaw / 10.0;
 
-    /// <summary>Pegel in dBµV mit bereichsabhängiger Korrektur.</summary>
+    /// <summary>Level in dBµV with range-dependent correction.</summary>
     public double? LevelDbuV
     {
         get
@@ -148,8 +148,8 @@ public sealed record StatusReading(byte State, int StrengthRaw, int Quality)
     }
 
     /// <summary>
-    /// Bitfehlerrate: Ziffern als Mantisse, Stellenzahl-1 als negativer Exponent.
-    /// Unter 300 gilt als &lt; 1E-7, über 950000 als &gt; 1E-1.
+    /// Bit error rate: digits as mantissa, digit count - 1 as negative exponent.
+    /// Below 300 counts as &lt; 1E-7, above 950000 as &gt; 1E-1.
     /// </summary>
     public double? Ber
     {

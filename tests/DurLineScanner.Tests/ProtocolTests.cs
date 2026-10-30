@@ -4,12 +4,12 @@ using DurLineScanner.Scanning;
 
 namespace DurLineScanner.Tests;
 
-/// <summary>Testdaten sind echte Antworten des SF 4000 BT (Astra 19,2° O, 2026-10-27).</summary>
+/// <summary>Test data are real responses from the SF 4000 BT (Astra 19.2° E, 2026-10-27).</summary>
 public class ProtocolTests
 {
     [Theory]
-    [InlineData(11494, Polarization.Horizontal, 22000, "A5F286D055F0")] // am Gerät mit Lock verifiziert
-    [InlineData(12188, Polarization.Horizontal, 27500, "A5F2C6346B6C")] // am Gerät mit Lock verifiziert
+    [InlineData(11494, Polarization.Horizontal, 22000, "A5F286D055F0")] // verified with lock on the device
+    [InlineData(12188, Polarization.Horizontal, 27500, "A5F2C6346B6C")] // verified with lock on the device
     [InlineData(10744, Polarization.Horizontal, 22000, "A5F283E255F0")]
     [InlineData(11836, Polarization.Vertical, 27500, "A5F244D46B6C")]
     public void EncodeTune_UniversalLnb(int freq, Polarization pol, int sr, string expected)
@@ -92,7 +92,7 @@ public class ProtocolTests
         {
             FrequencyMHz = f, Polarization = Polarization.Horizontal, TuneAccepted = true, Locked = locked, LevelDbuV = level,
         };
-        // Werte wie am Gerät gemessen: 10744 H ohne Lock bei 56 dBµV, Nachbarn mit Lock um 55 dBµV
+        // Values as measured on the device: 10744 H without lock at 56 dBµV, neighbors with lock around 55 dBµV
         var session = new ScanSession
         {
             Results = [R(10744, false, 56.0), R(11303, true, 55.1), R(11494, true, 55.2), R(11597, true, 54.0), R(11685, false, 41.0)],
@@ -101,7 +101,7 @@ public class ProtocolTests
         session.ClassifyMissingTransponders();
 
         Assert.True(session.Results[0].ProbablyInactive);
-        Assert.False(session.Results[4].ProbablyInactive); // Pegel deutlich zu niedrig → echtes Loch
+        Assert.False(session.Results[4].ProbablyInactive); // level clearly too low → real hole
         Assert.Equal(1, session.HoleCount);
     }
 
@@ -116,7 +116,7 @@ public class ProtocolTests
         };
         var results = new[] { R(10744, 60, 12), R(11303, 61, 16), R(11494, 75, 17), R(11600, 60, 15) };
 
-        // 11494 hat zwar die höchste MER, ist aber beim Pegel ein Ausreißer
+        // 11494 has the highest MER, but its level is an outlier
         Assert.Equal(11303, ReferenceSelector.Suggest(plane, results)!.FrequencyMHz);
     }
 }

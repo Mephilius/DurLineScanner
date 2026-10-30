@@ -6,7 +6,7 @@ using DurLineScanner.Controls;
 
 namespace DurLineScanner;
 
-/// <summary>Hilfe: Benutzerhandbuch (in der Oberflächensprache), Über (Version, Lizenz, Quellen) und Lizenztext.</summary>
+/// <summary>Help: user guide (in the UI language), about (version, license, sources) and license text.</summary>
 public partial class HelpWindow : Window
 {
     private const string GermanGuide = "Help.BENUTZERHANDBUCH.md";
@@ -37,7 +37,7 @@ public partial class HelpWindow : Window
         ShowGuide();
     }
 
-    /// <summary>Links aus dem Handbuch: Verweis auf die andere Sprachfassung, sonst im Browser öffnen.</summary>
+    /// <summary>Links from the guide: switch to the other language version, otherwise open in the browser.</summary>
     private void OpenLink(string target)
     {
         if (target.EndsWith("USER_GUIDE.md", StringComparison.OrdinalIgnoreCase) || target.EndsWith("BENUTZERHANDBUCH.md", StringComparison.OrdinalIgnoreCase))
