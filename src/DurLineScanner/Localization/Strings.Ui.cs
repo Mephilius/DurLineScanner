@@ -1,6 +1,6 @@
 namespace DurLineScanner.Localization;
 
-/// <summary>Englische Texte der Fenster (MainWindow, SettingsWindow). Schlüssel = deutscher Text.</summary>
+/// <summary>English window texts (MainWindow, SettingsWindow). Key = German text.</summary>
 public static partial class L
 {
     static partial void AddUi(Dictionary<string, string> d)
@@ -11,7 +11,7 @@ public static partial class L
         d["Sat-Messung mit dem SF 4000 BT"] = "Satellite measurement with the SF 4000 BT";
         d["Entwicklungsversion"] = "development build";
 
-        // Hilfe
+        // Help
         d["?  Hilfe"] = "?  Help";
         d["Benutzerhandbuch, Version und Lizenz (F1)"] = "User guide, version and license (F1)";
         d["Hilfe"] = "Help";
@@ -74,7 +74,12 @@ public static partial class L
         d["Enigma2-lamedb (/etc/enigma2/lamedb oder lamedb5) oder ein Senderlisten-Paket (ZIP) laden – zeigt die Programme je Transponder"] =
             "Load an Enigma2 lamedb (/etc/enigma2/lamedb or lamedb5) or a channel list package (ZIP) – shows the programmes per transponder";
         d["Messreihen"] = "Scans";
-        d["Auswählen = anzeigen · Häkchen = zum Vergleich einblenden"] = "Select = show · Tick = overlay for comparison";
+        d["Auswählen = anzeigen · Häkchen = zum Vergleich und zur Diagnose hinzunehmen"] = "Select = show · Tick = add to comparison and diagnosis";
+        d["Diagnose"] = "Diagnosis";
+        d["Alle Messreihen des Standorts ankreuzen"] = "Tick all measurement series of the site";
+        d["Hakt alle Messreihen mit demselben Standort und Satelliten wie die angezeigte an"] = "Ticks all measurement series with the same site and satellite as the displayed one";
+        d["Vermuteter Ort"] = "Suspected location";
+        d["Nächster Schritt"] = "Next step";
         d["Messreihen nach Messort filtern"] = "Filter scans by measuring point";
         d["Messreihen nach Wetter filtern – Scans bei gleichem Wetter vergleichen"] = "Filter scans by weather – compare scans taken in the same weather";
         d["📦  Exportieren …"] = "📦  Export …";
@@ -153,10 +158,20 @@ public static partial class L
         d["Verbindung fehlgeschlagen: {0}"] = "Connection failed: {0}";
         d["{0} · Modell {1}"] = "{0} · model {1}";
         d["Verbindung verloren."] = "Connection lost.";
+        d["Keine Messreihe angezeigt."] = "No measurement series displayed.";
+        d["Ein Scan: Die Diagnose betrifft den ganzen Signalweg bis zu diesem Messort. Weitere Messreihen ankreuzen (andere Dosen, LNB-Port), um den Fehler in der Anlage einzugrenzen."] =
+            "One scan: the diagnosis covers the whole signal path up to this measuring point. Tick further measurement series (other outlets, LNB port) to locate the fault in the system.";
+        d["{0} Scans: angezeigte Messreihe plus {1} mit Häkchen. Was an allen Dosen auftritt, liegt vor dem Multischalter; was nur an einzelnen auftritt, in deren Leitung."] =
+            "{0} scans: the displayed measurement series plus {1} ticked. What occurs at all outlets lies before the multiswitch; what occurs only at single ones lies in their cables.";
+        d["{0} angekreuzte Messreihen eines anderen Satelliten sind nicht einbezogen."] = "{0} ticked measurement series of another satellite are not included.";
+        d["{0} weitere Messreihen des Standorts angehakt."] = "{0} more measurement series of the site ticked.";
+        d["deutlich"] = "clear";
+        d["Hinweis"] = "hint";
+        d["Info"] = "info";
         d["Noch kein Standort – mit „…“ anlegen (Adresse, Schüsselgröße, LNB)"] = "No site yet – create one with “…” (address, dish size, LNB)";
         d["{0:0.000}° N, {1:0.000}° O"] = "{0:0.000}° N, {1:0.000}° E";
         d["ohne Koordinaten"] = "without coordinates";
-        d["{0}\n{1}\n{2}\nSchüssel {3} cm · LNB {4:0.#} dB"] = "{0}\n{1}\n{2}\nDish {3} cm · LNB {4:0.#} dB";
+        d["{0}\n{1}\n{2}\nSchüssel {3} cm · LNB {4:0.#} dB, {5}"] = "{0}\n{1}\n{2}\nDish {3} cm · LNB {4:0.#} dB, {5}";
         d["Senderliste jetzt von {0} {1} laden"] = "Load the channel list from {0} {1} now";
         d["Senderliste online vom Enigma2-Receiver oder TVHeadend laden – zuerst in den Einstellungen eintragen"] =
             "Load the channel list online from the Enigma2 receiver or TVHeadend – set it up in Settings first";
@@ -284,6 +299,28 @@ public static partial class L
         d["Durchmesser bzw. bei Offset-Schüsseln die Breite"] = "Diameter, or the width for offset dishes";
         d["Verstärkung des LNB (dB)"] = "LNB gain (dB)";
         d["Konversionsgewinn laut Datenblatt, typisch 50–65 dB"] = "Conversion gain from the data sheet, typically 50–65 dB";
+        d["Typ des LNB"] = "LNB type";
+        d["Hersteller des LNB"] = "LNB manufacturer";
+        d["Modell des LNB"] = "LNB model";
+        d["Nur Hersteller mit veröffentlichten Daten – sonst „unbekannt“ lassen und Typ und Verstärkung von Hand eintragen"] =
+            "Only manufacturers with published data – otherwise leave “unknown” and enter type and gain by hand";
+        d["Übernimmt Typ und Verstärkung laut Hersteller – beides lässt sich danach noch ändern"] =
+            "Takes type and gain from the manufacturer data – both can still be changed afterwards";
+        d["Quattro: vier feste Ausgänge für einen Multischalter. Single/Twin/Quad/Octo: jeder Ausgang liefert die Ebene, die der Receiver wählt. Die Diagnose richtet ihre Prüfschritte danach aus."] =
+            "Quattro: four fixed outputs for a multiswitch. Single/Twin/Quad/Octo: each output delivers the plane the receiver selects. The diagnosis adapts its checking steps to it.";
+        d["unbekannt"] = "unknown";
+        d["Multischalter"] = "Multiswitch";
+        d["Art"] = "Kind";
+        d["Aktive Multischalter verstärken, passive dämpfen nur"] = "Active multiswitches amplify, passive ones only attenuate";
+        d["Ausgangspegel regelbar"] = "Output level adjustable";
+        d["Welche Pegel sich am Multischalter einstellen lassen – die Diagnose sagt dann, ob der Regler ein Problem lösen kann"] =
+            "Which levels can be set at the multiswitch – the diagnosis then tells whether the control can solve a problem";
+        d["Schräglage (Slope) regelbar"] = "Slope adjustable";
+        d["Entzerrung, die die höhere Kabeldämpfung bei hohen Frequenzen ausgleicht"] = "Equalization that compensates the higher cable attenuation at high frequencies";
+        d["Quadtauglich"] = "Quad-capable";
+        d["Kann einen Quad-LNB statt eines Quattro-LNB betreiben"] = "Can run a quad LNB instead of a quattro LNB";
+        d["Modell"] = "Model";
+        d["Nur zur Dokumentation, z.B. „Spaun SMS 5803 NF“"] = "For documentation only, e.g. “Spaun SMS 5803 NF”";
         d["Allgemein"] = "General";
         d["Receiver / Senderliste"] = "Receiver / channel list";
         d["Die Senderliste (welche Programme auf welchem Transponder liegen) kann direkt vom eigenen Receiver geladen werden. Enigma2: über OpenWebif, notfalls per FTP (Benutzer root). TVHeadend: über die Web-API (Port 9981, Benutzer mit Admin-Recht)."] =

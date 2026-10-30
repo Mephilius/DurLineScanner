@@ -21,15 +21,16 @@ ankommt und wie gut eine Anlage im Vergleich zur Erwartung arbeitet.
 8. [Registerkarte Live-Messung](#8-registerkarte-live-messung)
 9. [Registerkarte Ebenen & Pegel](#9-registerkarte-ebenen--pegel)
 10. [Registerkarte Vergleich](#10-registerkarte-vergleich)
-11. [Registerkarte Tabelle](#11-registerkarte-tabelle)
-12. [Messreihen verwalten, exportieren und importieren](#12-messreihen-verwalten-exportieren-und-importieren)
-13. [Transponderliste und Senderliste](#13-transponderliste-und-senderliste)
-14. [So werden die Messwerte bewertet](#14-so-werden-die-messwerte-bewertet)
-15. [Die Ampel](#15-die-ampel)
-16. [Praxis: typische Aufgaben](#16-praxis-typische-aufgaben)
-17. [Dateien und Speicherorte](#17-dateien-und-speicherorte)
-18. [Fehlerbehebung](#18-fehlerbehebung)
-19. [Grenzen und Hinweise](#19-grenzen-und-hinweise)
+11. [Registerkarte Diagnose](#11-registerkarte-diagnose)
+12. [Registerkarte Tabelle](#12-registerkarte-tabelle)
+13. [Messreihen verwalten, exportieren und importieren](#13-messreihen-verwalten-exportieren-und-importieren)
+14. [Transponderliste und Senderliste](#14-transponderliste-und-senderliste)
+15. [So werden die Messwerte bewertet](#15-so-werden-die-messwerte-bewertet)
+16. [Die Ampel](#16-die-ampel)
+17. [Praxis: typische Aufgaben](#17-praxis-typische-aufgaben)
+18. [Dateien und Speicherorte](#18-dateien-und-speicherorte)
+19. [Fehlerbehebung](#19-fehlerbehebung)
+20. [Grenzen und Hinweise](#20-grenzen-und-hinweise)
 
 ---
 
@@ -57,7 +58,7 @@ Startmenü und auf Wunsch eine Desktop-Verknüpfung an. Eine separate .NET-Insta
 **Portable:** `DurLineScanner-<Version>-win-x64-portable.zip` entpacken und `DurLineScanner.exe` starten.
 
 **Deinstallieren:** über *Einstellungen → Apps* von Windows. Messreihen und Einstellungen bleiben erhalten
-(siehe [Dateien und Speicherorte](#17-dateien-und-speicherorte)).
+(siehe [Dateien und Speicherorte](#18-dateien-und-speicherorte)).
 
 **Aus dem Quelltext:** .NET-10-SDK installieren, dann im Projektordner `dotnet run --project src/DurLineScanner`.
 
@@ -76,7 +77,7 @@ Startmenü und auf Wunsch eine Desktop-Verknüpfung an. Eine separate .NET-Insta
 Nach der ersten Verbindung merkt sich das Programm die Bluetooth-Adresse. Der grüne Punkt neben dem Gerätenamen
 zeigt eine bestehende Verbindung; **Trennen** beendet sie.
 
-Wird das Gerät nicht gefunden: siehe [Fehlerbehebung](#18-fehlerbehebung).
+Wird das Gerät nicht gefunden: siehe [Fehlerbehebung](#19-fehlerbehebung).
 
 ### Sprache
 
@@ -107,6 +108,12 @@ Erwartungswerte der Ampel.
 | Breite / Länge | Koordinaten in Grad (Nord und Ost positiv). Werden automatisch ermittelt |
 | Größe der Schüssel (cm) | Durchmesser, bei Offset-Schüsseln die Breite |
 | Verstärkung des LNB (dB) | Konversionsgewinn laut Datenblatt, typisch 50–65 dB |
+| Hersteller und Modell des LNB | Auswahl aus rund 135 LNBs mit veröffentlichten Herstellerdaten; ein Modell übernimmt Typ und Verstärkung (bei einem Bereich den Mittelwert), beides lässt sich danach ändern. Vorgabe *unbekannt* |
+| Typ des LNB | *unbekannt*, Single, Twin, Quad, Octo, Quattro (für Multischalter) oder Unicable/JESS. Die Diagnose richtet ihre Prüfschritte danach aus |
+| Multischalter: Art | *unbekannt*, keiner (LNB direkt am Receiver), passiv oder aktiv |
+| Multischalter: Ausgangspegel regelbar | *unbekannt*, nicht regelbar, gemeinsam für alle Ebenen, je Band oder je Ebene |
+| Multischalter: Schräglage (Slope) regelbar, quadtauglich | *unbekannt*, ja oder nein |
+| Multischalter: Modell | Freitext, nur zur Dokumentation |
 
 **Koordinaten ermitteln:** Beim Verlassen des Adressfelds (oder mit **📍 Koordinaten ermitteln**) sucht das
 Programm die Adresse bei OpenStreetMap (Nominatim). Der gefundene Ort wird unter dem Feld angezeigt. Wird nichts
@@ -174,7 +181,7 @@ Scans sind deshalb nur bei vergleichbarem Wetter wirklich vergleichbar.
 | Ebenen | normalerweise *alle* | bei einem **Quattro-LNB** führt jeder Port fest eine Ebene: dann diese wählen, es wird nur sie gemessen |
 
 **Dritte Zeile** zeigt den Fortschritt eines Scans und die verwendete Transponder- und Senderliste mit den
-Knöpfen zum Aktualisieren (siehe [Kapitel 13](#13-transponderliste-und-senderliste)).
+Knöpfen zum Aktualisieren (siehe [Kapitel 14](#14-transponderliste-und-senderliste)).
 
 ## 6. Einen Scan durchführen
 
@@ -192,7 +199,7 @@ mit der **Ampel** angezeigt.
 
 ## 7. Registerkarte Übersicht
 
-- **Ampel** oben: Gesamturteil zur angezeigten Messreihe mit Begründungen (siehe [Kapitel 15](#15-die-ampel)).
+- **Ampel** oben: Gesamturteil zur angezeigten Messreihe mit Begründungen (siehe [Kapitel 16](#16-die-ampel)).
 - **Messwert**: MER, C/N, Pegel, Qualität oder Stärke. Die Maus über der Auswahl erklärt den Wert und seine
   Bewertungsbereiche.
 - **Zwei Diagramme** – horizontal und vertikal: ein Balken je Transponder über der Frequenz, eingefärbt nach
@@ -264,7 +271,76 @@ die angezeigte an.
 Typisch: LNB-Ports gegen Dosen vergleichen. Was am Port ankommt und an der Dose fehlt, geht im Verteilnetz verloren
 (Kabel, Verteiler, Multischalter, Dose).
 
-## 11. Registerkarte Tabelle
+## 11. Registerkarte Diagnose
+
+Sucht in den Messwerten nach typischen Fehlerbildern und nennt zu jedem Befund die Belege, den vermuteten Ort der
+Ursache und einen nächsten Prüfschritt. Rot markierte Befunde sind deutlich, gelbe sind Hinweise.
+
+**Einbezogene Scans:** die angezeigte Messreihe plus alle mit Häkchen – dieselben Häkchen wie beim Vergleich –,
+soweit sie vom selben Satelliten stammen. **Alle Messreihen des Standorts ankreuzen** hakt alle Messreihen mit
+demselben Standort und Satelliten an.
+
+- **Ein Scan** sieht den ganzen Weg vom LNB bis zum Messort als eine Strecke. Er erkennt die Art eines Fehlers und
+  grenzt den Ort über die vier Ebenen grob ein.
+- **Mehrere Scans** verorten den Fehler in der Anlage. Am aussagekräftigsten sind Scans an allen Dosen plus am
+  LNB-Port.
+
+| Fehlerbild tritt auf … | Ursache liegt wahrscheinlich … |
+|---|---|
+| schon am LNB-Port | am LNB, an der Schüssel oder der Ausrichtung |
+| an allen Dosen, aber nicht am LNB-Port | in der Stammleitung oder am Multischalter-Eingang |
+| an allen Dosen, LNB-Port nicht gemessen | vor den Multischalter-Ausgängen (LNB, Stammleitung, Eingang) |
+| nur an einzelnen Dosen | in deren Dosenleitung, Dose oder am Multischalter-Ausgang |
+
+Eine Dose, die knapp unter einer Schwelle bleibt, zählt beim Verorten mit („Schwächer ausgeprägt auch: …“) – sonst
+sähe ein gemeinsamer Fehler wie ein Problem einzelner Dosenleitungen aus.
+
+Welche **Ebenen** betroffen sind, grenzt den Ort ebenfalls ein:
+
+| Betroffen | Ursache liegt wahrscheinlich … |
+|---|---|
+| nur eine Ebene | im Zweig dieser Ebene: LNB-Ausgang, Stammleitung, F-Stecker, Multischalter-Eingang |
+| beide Polarisationen eines Bandes | am LNB-Oszillator dieses Bandes oder an der Band-Umschaltung (22 kHz) |
+| beide Bänder einer Polarisation | im Polarisationszweig des LNB oder am Skew |
+| alle Ebenen | im gemeinsamen Weg (Dosenleitung, Dose) – oder an Schüssel und LNB |
+
+**Erkannte Fehlerbilder:**
+
+| Befund | Woran erkannt | Typische Ursache |
+|---|---|---|
+| Tiefe Frequenzen gedämpft (Hochpass) | Pegel steigt in den ersten 300 MHz einer Ebene um 8 dB oder mehr, danach flach – deutlich stärker als auf den anderen Ebenen | F-Stecker mit zu kurzem, korrodiertem oder nicht richtig steckendem Innenleiter |
+| Pegel weicht von den anderen Ebenen ab | Ebene 6 dB oder mehr über oder unter den anderen | Einstellung am Multischalter oder Verstärker, oder ein Fehler in der Leitung |
+| Pegel zu niedrig / sehr hoch | mehrere Transponder unter 47 dBµV bzw. ab 76 dBµV | zu wenig Verstärkung, lange Leitung / Übersteuerung |
+| Pegel da, aber kein Empfang | weniger als 30 % Lock, obwohl Pegel anliegt | vertauschte Multischalter-Eingänge |
+| Kein Signal | kaum Lock, kaum Pegel | LNB-Ausgang, Kabel, LNB-Versorgung |
+| MER schlechter als auf den anderen Ebenen | Ebene 2,5 dB oder mehr weiter unter den Bestwerten als die anderen | Leitung oder Multischalter-Eingang dieser Ebene |
+| MER-Einbrüche bei einzelnen Frequenzen | einzelne Transponder 2,5 dB oder mehr schlechter als der Rest ihrer Ebene, bei normalem Pegel | Reflexionen: Knick, Quetschung, schlechter Stecker, offener Abzweig |
+| Störung – Einstrahlung? | Einbrüche gehäuft im ZF-Bereich eines Funkdienstes: GSM 900, LTE 1500, LTE 1800, DECT, LTE 2100 | schlecht geschirmte Kabel oder Dosen, offene Ausgänge |
+| Schlechte Polarisationsentkopplung | Transponder mit Gegenstück auf derselben Frequenz der anderen Polarisation sind schlechter | Skew falsch eingestellt, LNB |
+| MER auf allen Ebenen unter den Bestwerten | alle Ebenen 3 dB oder mehr unter den Bestwerten | Ausrichtung, Schüssel, LNB |
+| Weniger / mehr Pegel als die anderen Dosen (ab 2 Scans) | Dose 6 dB oder mehr vom Median der Dosen entfernt | Länge der Dosenleitung, zusätzlicher Verteiler, Stecker |
+| Mehr Pegel, aber schlechtere MER – Übersteuerung (ab 2 Scans) | Dosen mit mehr Pegel haben auf einer Ebene schlechtere MER | Multischalter-Ausgang zu hoch eingestellt |
+| Messwerte schwanken (ab 2 Scans am selben Ort) | MER oder Lock unterscheiden sich zwischen den Wiederholungen | Wackelkontakt, Feuchtigkeit, Wetterwechsel |
+
+**LNB-Typ:** Wie sich ein Fehler auf einer Ebene eingrenzen lässt, hängt vom LNB ab. Ein Quattro-LNB hat je Ebene
+einen festen Ausgang – zum Vergleich müssen die Stammleitungen an beiden Enden getauscht werden. Ein Quad-LNB an
+einem quadtauglichen Multischalter bekommt seine Ebene vom Eingang – dort reicht der Tausch. Ist der Typ in den
+Standort-Einstellungen *unbekannt*, nennt die Diagnose beide Wege.
+
+**Multischalter:** Mit seinen Angaben werden die Ratschläge konkret: ob der Pegel am Regler oder mit einem
+Dämpfungsglied gesenkt wird, ob ein Regler je Band einen Unterschied zwischen H und V überhaupt ausgleichen kann,
+ob die Schräglage am Multischalter nachgestellt werden kann. Erkannt werden die Fehler auch ohne diese Angaben.
+
+**MER je Transponder:** Jeder Transponder hat von Natur aus eine eigene MER. Die Diagnose vergleicht deshalb mit dem
+besten Wert, der für diesen Transponder in allen gespeicherten Messreihen des Satelliten gemessen wurde – umgerechnet
+auf Schüsselgröße und Wetter des Scans. Gibt es noch keine zweite Messreihe des Satelliten, entfallen die
+MER-Befunde.
+
+Die Befunde sind Vermutungen aus Mustern, keine Beweise – deshalb nennt jeder einen Prüfschritt. Das Messgerät misst
+nur an den Transpondern, und sein Pegel ist nicht kalibriert; die Diagnose vergleicht deshalb vor allem relativ:
+zwischen Ebenen, Frequenzen und Messorten.
+
+## 12. Registerkarte Tabelle
 
 Alle Messwerte der angezeigten Messreihe, sortierbar per Klick auf die Spaltenüberschrift.
 
@@ -275,7 +351,7 @@ Alle Messwerte der angezeigten Messreihe, sortierbar per Klick auf die Spaltenü
 - Die Maus über einer Spaltenüberschrift erklärt den Messwert.
 - Rot hinterlegte Zeilen = Empfangsloch, graue Schrift = vermutlich abgeschaltet.
 
-## 12. Messreihen verwalten, exportieren und importieren
+## 13. Messreihen verwalten, exportieren und importieren
 
 Die Liste links zeigt die Messreihen des **oben gewählten Standorts**, neueste zuerst (ein Standortwechsel wechselt auch die Liste; ein Standort ohne Messreihen zeigt eine leere Liste): farbiger **Ampel-Punkt**, Messort, Datum,
 Lock und Löcher, Wetter und Standort, Notiz.
@@ -291,7 +367,7 @@ Lock und Löcher, Wetter und Standort, Notiz.
 - **Importieren …**: liest eine solche ZIP-Datei ein. Der Standort wird angelegt, falls er noch fehlt; Messreihen,
   die schon vorhanden sind, werden nicht doppelt übernommen.
 
-## 13. Transponderliste und Senderliste
+## 14. Transponderliste und Senderliste
 
 **Transponderliste** – welche Transponder es auf einem Satelliten gibt. Verwendet wird die `satellites.xml` von
 OpenPLi (aus LyngSat-Daten erzeugt). Sie wird nicht mitgeliefert, sondern **beim ersten Start automatisch aus dem
@@ -306,7 +382,7 @@ Die LNB-Frequenzen sind Standardwerte: Universal-LNB 9750/10600 MHz, C-Band 5150
 
 Die Senderliste wird für die Programmanzeige in der Tabelle und für die Sendersuche in der Live-Messung gebraucht.
 
-## 14. So werden die Messwerte bewertet
+## 15. So werden die Messwerte bewertet
 
 Alle Werte werden in fünf Stufen bewertet: **sehr gut, gut, grenzwertig, schlecht, sehr schlecht**.
 
@@ -320,7 +396,7 @@ Alle Werte werden in fünf Stufen bewertet: **sehr gut, gut, grenzwertig, schlec
 Die MER ist der aussagekräftigste Wert. Der Pegel des Messgeräts ist nicht kalibriert: Vergleiche zwischen Ebenen,
 Dosen und Messreihen sind aussagekräftiger als die Absolutwerte.
 
-## 15. Die Ampel
+## 16. Die Ampel
 
 | Farbe | Bedeutung |
 |---|---|
@@ -350,7 +426,7 @@ Sendeleistung ab.
 
 Ohne Standort bewertet die Ampel nur Reserve, Löcher und Ebenen.
 
-## 16. Praxis: typische Aufgaben
+## 17. Praxis: typische Aufgaben
 
 ### Schüssel ausrichten
 
@@ -368,6 +444,8 @@ Ohne Standort bewertet die Ampel nur Reserve, Löcher und Ebenen.
 2. Scan an jeder Dose (Raum und Anschluss wählen).
 3. **Vergleich**: Ports und Dosen anhaken. Große Pegelunterschiede zwischen Port und Dose oder zwischen Dosen zeigen
    Verluste im Kabel, Verteiler oder Multischalter; Löcher nur an einer Dose deuten auf die Dose oder ihr Kabel.
+4. **Diagnose**: mit **Alle Messreihen des Standorts ankreuzen** alle Scans einbeziehen. Die Befunde sagen, ob ein
+   Fehler schon am LNB, vor dem Multischalter oder nur in einzelnen Dosenleitungen liegt.
 
 ### Verstärker- oder Multischalter-Pegel einstellen
 
@@ -378,7 +456,7 @@ angehoben oder abgesenkt werden sollte und ob die Entzerrung (Slope) passt.
 
 Linke Liste nach Wetter filtern oder in **Vergleich** auf **Gleiche Bedingungen ankreuzen** klicken.
 
-## 17. Dateien und Speicherorte
+## 18. Dateien und Speicherorte
 
 | Ort | Inhalt |
 |---|---|
@@ -389,7 +467,7 @@ Linke Liste nach Wetter filtern oder in **Vergleich** auf **Gleiche Bedingungen 
 | `%AppData%\DurLineScanner\satellites.xml` | aktualisierte oder importierte Transponderliste |
 | `%AppData%\DurLineScanner\lamedb` | geladene Senderliste |
 
-## 18. Fehlerbehebung
+## 19. Fehlerbehebung
 
 | Problem | Lösung |
 |---|---|
@@ -401,7 +479,7 @@ Linke Liste nach Wetter filtern oder in **Vergleich** auf **Gleiche Bedingungen 
 | Senderliste vom Receiver lädt nicht | Die unter dem Adressfeld angezeigte Verbindung im Browser öffnen. Antwortet sie nicht: Port und HTTPS-Haken prüfen (hinter einem Proxy meist HTTPS ohne Port). Benutzer und Passwort prüfen; bei TVHeadend Admin-Recht nötig |
 | Programme in der Tabelle fehlen | Senderliste laden; sie muss den gewählten Satelliten enthalten |
 
-## 19. Grenzen und Hinweise
+## 20. Grenzen und Hinweise
 
 - **Nur mit einem Gerät getestet** (DUR-line SF 4000 BT, „Finder S2“, Modell 260B).
 - Der Pegel des Messgeräts ist nicht kalibriert; Absolutwerte können um einige dB abweichen.

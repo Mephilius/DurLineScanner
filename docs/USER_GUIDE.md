@@ -21,15 +21,16 @@ an installation performs compared with what is expected.
 8. [Live measurement tab](#8-live-measurement-tab)
 9. [Planes & levels tab](#9-planes--levels-tab)
 10. [Compare tab](#10-compare-tab)
-11. [Table tab](#11-table-tab)
-12. [Managing, exporting and importing scans](#12-managing-exporting-and-importing-scans)
-13. [Transponder list and channel list](#13-transponder-list-and-channel-list)
-14. [How the metrics are rated](#14-how-the-metrics-are-rated)
-15. [The traffic light](#15-the-traffic-light)
-16. [In practice: typical tasks](#16-in-practice-typical-tasks)
-17. [Files and storage locations](#17-files-and-storage-locations)
-18. [Troubleshooting](#18-troubleshooting)
-19. [Limits and notes](#19-limits-and-notes)
+11. [Diagnosis tab](#11-diagnosis-tab)
+12. [Table tab](#12-table-tab)
+13. [Managing, exporting and importing scans](#13-managing-exporting-and-importing-scans)
+14. [Transponder list and channel list](#14-transponder-list-and-channel-list)
+15. [How the metrics are rated](#15-how-the-metrics-are-rated)
+16. [The traffic light](#16-the-traffic-light)
+17. [In practice: typical tasks](#17-in-practice-typical-tasks)
+18. [Files and storage locations](#18-files-and-storage-locations)
+19. [Troubleshooting](#19-troubleshooting)
+20. [Limits and notes](#20-limits-and-notes)
 
 ---
 
@@ -57,7 +58,7 @@ and, if you wish, a desktop shortcut. A separate .NET installation is not requir
 **Portable:** Unzip `DurLineScanner-<Version>-win-x64-portable.zip` and start `DurLineScanner.exe`.
 
 **Uninstalling:** via *Settings → Apps* in Windows. Scans and settings are kept
-(see [Files and storage locations](#17-files-and-storage-locations)).
+(see [Files and storage locations](#18-files-and-storage-locations)).
 
 **From source:** Install the .NET 10 SDK, then run `dotnet run --project src/DurLineScanner` in the project folder.
 
@@ -76,7 +77,7 @@ and, if you wish, a desktop shortcut. A separate .NET installation is not requir
 After the first connection the program remembers the Bluetooth address. The green dot next to the device name
 shows an active connection; **Disconnect** ends it.
 
-If the device is not found: see [Troubleshooting](#18-troubleshooting).
+If the device is not found: see [Troubleshooting](#19-troubleshooting).
 
 ### Language
 
@@ -107,6 +108,12 @@ used by the traffic light.
 | Latitude / Longitude | coordinates in degrees (north and east positive). Determined automatically |
 | Dish size (cm) | diameter; for offset dishes, the width |
 | LNB gain (dB) | conversion gain according to the data sheet, typically 50–65 dB |
+| LNB manufacturer and model | choice of about 135 LNBs with published manufacturer data; a model takes over type and gain (the middle of a range), both can be changed afterwards. Default *unknown* |
+| LNB type | *unknown*, Single, Twin, Quad, Octo, Quattro (for multiswitches) or Unicable/JESS. The diagnosis adapts its checking steps to it |
+| Multiswitch: kind | *unknown*, none (LNB directly at the receiver), passive or active |
+| Multiswitch: output level adjustable | *unknown*, not adjustable, together for all planes, per band or per plane |
+| Multiswitch: slope adjustable, quad-capable | *unknown*, yes or no |
+| Multiswitch: model | free text, for documentation only |
 
 **Finding coordinates:** When you leave the address field (or with **📍 Find coordinates**), the program looks up
 the address at OpenStreetMap (Nominatim). The location found is shown below the field. If nothing is found, check
@@ -174,7 +181,7 @@ are therefore only truly comparable when the weather is comparable.
 | Planes | normally *all* | with a **Quattro LNB**, each port carries one fixed plane: select that one, and only it is measured |
 
 **The third row** shows the progress of a scan and the transponder list and channel list in use, with the buttons
-for updating them (see [Chapter 13](#13-transponder-list-and-channel-list)).
+for updating them (see [Chapter 14](#14-transponder-list-and-channel-list)).
 
 ## 6. Running a scan
 
@@ -192,7 +199,7 @@ After the scan, the scan is saved automatically, selected in the list on the lef
 
 ## 7. Overview tab
 
-- **Traffic light** at the top: overall verdict for the displayed scan with reasons (see [Chapter 15](#15-the-traffic-light)).
+- **Traffic light** at the top: overall verdict for the displayed scan with reasons (see [Chapter 16](#16-the-traffic-light)).
 - **Metric**: MER, C/N, level, quality or strength. Hovering the mouse over the selection explains the value and
   its rating ranges.
 - **Two charts** – horizontal and vertical: one bar per transponder over frequency, colored by rating
@@ -263,7 +270,74 @@ displayed.
 Typical use: comparing LNB ports against outlets. What arrives at the port and is missing at the outlet is lost in
 the distribution network (cable, splitter, multiswitch, outlet).
 
-## 11. Table tab
+## 11. Diagnosis tab
+
+Searches the readings for typical fault patterns and gives for each finding the evidence, the suspected location of
+the cause and a next step to check. Findings marked red are clear, yellow ones are hints.
+
+**Included scans:** the displayed scan plus all ticked ones – the same ticks as for the comparison – as far as they
+are from the same satellite. **Tick all measurement series of the site** ticks all scans with the same site and
+satellite.
+
+- **One scan** sees the whole path from the LNB to the measuring point as one line. It recognizes the kind of a
+  fault and roughly narrows down its location via the four planes.
+- **Several scans** locate the fault in the system. Scans at all outlets plus at the LNB port tell the most.
+
+| Fault pattern occurs … | The cause is probably … |
+|---|---|
+| already at the LNB port | at the LNB, the dish or the alignment |
+| at all outlets, but not at the LNB port | in the trunk line or at the multiswitch input |
+| at all outlets, LNB port not measured | before the multiswitch outputs (LNB, trunk line, input) |
+| only at single outlets | in their outlet cable, the outlet or at the multiswitch output |
+
+An outlet just below a threshold counts for locating ("Less pronounced also at: …") – otherwise a common fault would
+look like a problem of single outlet cables.
+
+Which **planes** are affected also narrows down the location:
+
+| Affected | The cause is probably … |
+|---|---|
+| one plane only | in the branch of this plane: LNB output, trunk line, F connector, multiswitch input |
+| both polarizations of a band | at the LNB oscillator of this band or the band switching (22 kHz) |
+| both bands of a polarization | in the polarization branch of the LNB or the skew |
+| all planes | in the shared path (outlet cable, outlet) – or at dish and LNB |
+
+**Recognized fault patterns:**
+
+| Finding | Recognized by | Typical cause |
+|---|---|---|
+| Low frequencies attenuated (high-pass) | level rises by 8 dB or more within the first 300 MHz of a plane, then flat – clearly more than on the other planes | F connector with a centre conductor that is too short, corroded or not seated |
+| Level differs from the other planes | plane 6 dB or more above or below the others | setting at the multiswitch or amplifier, or a fault in the line |
+| Level too low / very high | several transponders below 47 dBµV or from 76 dBµV | too little gain, long line / overload |
+| Level present but no reception | less than 30 % lock although level is present | swapped multiswitch inputs |
+| No signal | hardly any lock, hardly any level | LNB output, cable, LNB power |
+| MER worse than on the other planes | plane 2.5 dB or more further below the best values than the others | line or multiswitch input of this plane |
+| MER dips at single frequencies | single transponders 2.5 dB or more worse than the rest of their plane, at normal level | reflections: kink, crushing, bad connector, open tap |
+| Interference – ingress? | dips clustered in the IF range of a radio service: GSM 900, LTE 1500, LTE 1800, DECT, LTE 2100 | poorly shielded cables or outlets, open outputs |
+| Poor cross-polar isolation | transponders with a counterpart on the same frequency of the other polarization are worse | skew set wrong, LNB |
+| MER on all planes below the best values | all planes 3 dB or more below the best values | alignment, dish, LNB |
+| Less / more level than the other outlets (2 scans or more) | outlet 6 dB or more away from the median of the outlets | length of the outlet cable, additional splitter, connectors |
+| More level but worse MER – overload (2 scans or more) | outlets with more level have worse MER on a plane | multiswitch output set too high |
+| Readings fluctuate (2 scans or more at the same location) | MER or lock differ between the repetitions | loose contact, moisture, change of weather |
+
+**LNB type:** how a fault on one plane can be narrowed down depends on the LNB. A quattro LNB has one fixed output
+per plane – for a comparison the trunk lines must be swapped at both ends. A quad LNB on a quad-capable multiswitch
+gets its plane from the input – swapping there is enough. If the type in the site settings is *unknown*, the
+diagnosis names both ways.
+
+**Multiswitch:** its details make the advice concrete: whether the level is lowered at the control or with an
+attenuator, whether a per-band control can even out a difference between H and V at all, whether the slope can be
+readjusted at the multiswitch. The faults are recognized without these details as well.
+
+**MER per transponder:** every transponder has its own MER by nature. The diagnosis therefore compares with the best
+value measured for this transponder in all stored scans of the satellite – converted to the dish size and weather of
+the scan. Without a second scan of the satellite the MER findings are omitted.
+
+The findings are guesses from patterns, not proof – that is why each one names a step to check. The meter measures
+only at the transponders, and its level is not calibrated; the diagnosis therefore compares mostly relatively:
+between planes, frequencies and measuring points.
+
+## 12. Table tab
 
 All measured values of the displayed scan, sortable by clicking the column header.
 
@@ -274,7 +348,7 @@ All measured values of the displayed scan, sortable by clicking the column heade
 - Hovering over a column header explains the metric.
 - Rows with a red background = reception gap, gray text = probably switched off.
 
-## 12. Managing, exporting and importing scans
+## 13. Managing, exporting and importing scans
 
 The list on the left shows the scans of the **site selected at the top**, newest first (switching the site switches the list; a site without scans shows an empty list): colored **traffic-light dot**, measuring point, date,
 lock and gaps, weather and site, note.
@@ -291,7 +365,7 @@ lock and gaps, weather and site, note.
 - **Import …**: reads such a ZIP file. The site is created if it does not exist yet; scans that already exist are
   not imported twice.
 
-## 13. Transponder list and channel list
+## 14. Transponder list and channel list
 
 **Transponder list** – which transponders exist on a satellite. The app uses the `satellites.xml` from OpenPLi
 (generated from LyngSat data). It is not shipped with the app but **downloaded automatically at first start**.
@@ -306,7 +380,7 @@ The LNB frequencies are default values: universal LNB 9750/10600 MHz, C band 515
 
 The channel list is needed for the channel display in the table and for the channel search in the live measurement.
 
-## 14. How the metrics are rated
+## 15. How the metrics are rated
 
 All values are rated in five levels: **very good, good, marginal, poor, very poor**.
 
@@ -320,7 +394,7 @@ All values are rated in five levels: **very good, good, marginal, poor, very poo
 MER is the most meaningful value. The meter's level is not calibrated: comparisons between planes, outlets and
 scans are more meaningful than the absolute values.
 
-## 15. The traffic light
+## 16. The traffic light
 
 | Color | Meaning |
 |---|---|
@@ -349,7 +423,7 @@ result. The expectation is a guideline – outside Central Europe or for other s
 
 Without a site, the traffic light only rates margin, gaps and planes.
 
-## 16. In practice: typical tasks
+## 17. In practice: typical tasks
 
 ### Aligning the dish
 
@@ -367,6 +441,8 @@ Without a site, the traffic light only rates margin, gaps and planes.
 2. Scan at each outlet (select room and outlet).
 3. **Compare**: tick ports and outlets. Large level differences between port and outlet or between outlets show
    losses in the cable, splitter or multiswitch; gaps at only one outlet point to the outlet or its cable.
+4. **Diagnosis**: include all scans with **Tick all measurement series of the site**. The findings tell whether a
+   fault is already at the LNB, before the multiswitch or only in single outlet cables.
 
 ### Setting amplifier or multiswitch levels
 
@@ -377,7 +453,7 @@ or lowered and whether the equalization (slope) is right.
 
 Filter the list on the left by weather, or click **Tick same conditions** in **Compare**.
 
-## 17. Files and storage locations
+## 18. Files and storage locations
 
 | Location | Contents |
 |---|---|
@@ -388,7 +464,7 @@ Filter the list on the left by weather, or click **Tick same conditions** in **C
 | `%AppData%\DurLineScanner\satellites.xml` | updated or imported transponder list |
 | `%AppData%\DurLineScanner\lamedb` | loaded channel list |
 
-## 18. Troubleshooting
+## 19. Troubleshooting
 
 | Problem | Solution |
 |---|---|
@@ -400,7 +476,7 @@ Filter the list on the left by weather, or click **Tick same conditions** in **C
 | Channel list from the receiver does not load | Open the connection shown below the address field in a browser. If it does not respond: check port and the HTTPS box (behind a proxy usually HTTPS without port). Check user and password; TVHeadend requires admin rights |
 | Channels are missing in the table | Load a channel list; it must contain the selected satellite |
 
-## 19. Limits and notes
+## 20. Limits and notes
 
 - **Tested with only one device** (DUR-line SF 4000 BT, "Finder S2", model 260B).
 - The meter's level is not calibrated; absolute values can deviate by a few dB.

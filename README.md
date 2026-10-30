@@ -14,6 +14,7 @@ location and weather.
 - **Full scans** of all transponders of a satellite via Bluetooth LE, stored as measurement series
 - **Overview charts** per polarisation, coloured by rating; reception gaps and probably switched-off transponders marked
 - **Planes & levels**: level, imbalance and slope per IF plane (Low/High × V/H) – for amplifier and multiswitch tuning
+- **Diagnosis**: recognizes fault patterns (bad F connector, reflections, ingress, overload, swapped inputs …) and locates them in the system from several scans – LNB, trunk line/multiswitch or single outlet cables
 - **Live measurement** with gauges (MER, C/N, level, quality, strength, BER), peak markers, history and full-screen mode
 - **Mini scan**: up to 5 transponders spread across a plane, min/max shown in the gauges
 - **Sites**: address with automatic geocoding (OpenStreetMap), dish size, LNB gain; azimuth, elevation, skew and expected MER

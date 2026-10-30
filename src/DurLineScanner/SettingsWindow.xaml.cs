@@ -7,7 +7,7 @@ using DurLineScanner.Scanning;
 
 namespace DurLineScanner;
 
-/// <summary>Standortverwaltung und Receiver für die Senderliste.</summary>
+/// <summary>Site management and receiver for the channel list.</summary>
 public partial class SettingsWindow : Window
 {
     private static readonly int[] DishSizes = [45, 55, 60, 65, 75, 80, 85, 90, 100, 110, 120, 150, 180];
@@ -26,6 +26,13 @@ public partial class SettingsWindow : Window
         Sites = sites;
 
         SiteDishBox.ItemsSource = DishSizes;
+        SiteLnbTypeBox.ItemsSource = LnbTypes.All.Select(t => new Choice<LnbType>(t, LnbTypes.Text(t))).ToList();
+        SiteLnbMakerBox.ItemsSource = new[] { new Choice<string>("", L.T("unbekannt")) }
+            .Concat(LnbCatalog.Manufacturers.Select(m => new Choice<string>(m, m))).ToList();
+        SiteSwitchKindBox.ItemsSource = Enum.GetValues<MultiswitchKind>().Select(k => new Choice<MultiswitchKind>(k, MultiswitchTexts.Text(k))).ToList();
+        SiteSwitchLevelBox.ItemsSource = Enum.GetValues<LevelControl>().Select(c => new Choice<LevelControl>(c, MultiswitchTexts.Text(c))).ToList();
+        SiteSwitchSlopeBox.ItemsSource = YesNo();
+        SiteSwitchQuadBox.ItemsSource = YesNo();
         SiteList.ItemsSource = Sites;
         if (Sites.Count > 0) SiteList.SelectedIndex = 0;
         else UpdateSiteForm();
@@ -46,12 +53,12 @@ public partial class SettingsWindow : Window
 
     public List<Site> Sites { get; }
 
-    /// <summary>Wurde hier eine neue Senderliste geladen?</summary>
+    /// <summary>Was a new channel list loaded here?</summary>
     public bool ChannelsLoaded { get; private set; }
 
     private Site? SelectedSite => SiteList.SelectedItem as Site;
 
-    // ---------------------------------------------------------------- Standorte
+    // ---------------------------------------------------------------- Sites
 
     private void NewSiteButton_Click(object sender, RoutedEventArgs e)
     {
@@ -87,6 +94,16 @@ public partial class SettingsWindow : Window
         SiteLonBox.Text = site?.Longitude?.ToString("0.00000", CultureInfo.CurrentCulture) ?? "";
         SiteDishBox.Text = site?.DishCm.ToString() ?? "";
         SiteGainBox.Text = site?.LnbGainDb.ToString("0.#", CultureInfo.CurrentCulture) ?? "";
+        Select(SiteLnbTypeBox, site?.LnbType);
+        Select(SiteLnbMakerBox, site?.LnbManufacturer ?? "");
+        FillLnbModels(site?.LnbManufacturer ?? "");
+        Select(SiteLnbModelBox, site?.LnbModel ?? "");
+        UpdateLnbInfo();
+        Select(SiteSwitchKindBox, site?.Multiswitch);
+        Select(SiteSwitchLevelBox, site?.MultiswitchLevel);
+        Select(SiteSwitchSlopeBox, site is null ? null : site.MultiswitchSlope);
+        Select(SiteSwitchQuadBox, site is null ? null : site.MultiswitchQuad);
+        SiteSwitchModelBox.Text = site?.MultiswitchModel ?? "";
         GeocodeText.Text = site is null ? L.T("Noch kein Standort – mit „+ Neu“ anlegen.") : "";
         _geocodedAddress = site?.HasCoordinates == true ? site.Address : "";
         _loading = false;
@@ -103,14 +120,69 @@ public partial class SettingsWindow : Window
         site.Longitude = ParseNumber(SiteLonBox.Text, -180, 180);
         if (ParseNumber(SiteDishBox.Text, 20, 500) is { } dish) site.DishCm = (int)Math.Round(dish);
         if (ParseNumber(SiteGainBox.Text, 0, 90) is { } gain) site.LnbGainDb = gain;
+        if (SiteLnbTypeBox.SelectedItem is Choice<LnbType> lnb) site.LnbType = lnb.Value;
+        if (SiteSwitchKindBox.SelectedItem is Choice<MultiswitchKind> kind) site.Multiswitch = kind.Value;
+        if (SiteSwitchLevelBox.SelectedItem is Choice<LevelControl> level) site.MultiswitchLevel = level.Value;
+        if (SiteSwitchSlopeBox.SelectedItem is Choice<bool?> slope) site.MultiswitchSlope = slope.Value;
+        if (SiteSwitchQuadBox.SelectedItem is Choice<bool?> quad) site.MultiswitchQuad = quad.Value;
+        site.MultiswitchModel = SiteSwitchModelBox.Text.Trim();
         if (renamed) SiteList.Items.Refresh();
         UpdateLookInfo();
     }
 
+    private void SiteLnbMakerBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || SelectedSite is not { } site || SiteLnbMakerBox.SelectedItem is not Choice<string> maker) return;
+        site.LnbManufacturer = maker.Value;
+        site.LnbModel = "";
+        _loading = true;
+        FillLnbModels(maker.Value);
+        Select(SiteLnbModelBox, "");
+        _loading = false;
+        UpdateLnbInfo();
+    }
+
+    /// <summary>A catalogue model fills in type and gain; both can still be changed afterwards.</summary>
+    private void SiteLnbModelBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading || SelectedSite is not { } site || SiteLnbModelBox.SelectedItem is not Choice<string> model) return;
+        site.LnbModel = model.Value;
+        if (LnbCatalog.Find(site.LnbManufacturer, model.Value) is { } lnb)
+        {
+            _loading = true;
+            site.LnbType = lnb.Type;
+            Select(SiteLnbTypeBox, lnb.Type);
+            if (lnb.Gain is { } gain)
+            {
+                site.LnbGainDb = gain;
+                SiteGainBox.Text = gain.ToString("0.#", CultureInfo.CurrentCulture);
+            }
+            _loading = false;
+            UpdateLookInfo();
+        }
+        UpdateLnbInfo();
+    }
+
+    private void FillLnbModels(string manufacturer)
+    {
+        SiteLnbModelBox.ItemsSource = new[] { new Choice<string>("", L.T("unbekannt")) }
+            .Concat(LnbCatalog.Of(manufacturer).Select(m => new Choice<string>(m.Model, m.Model))).ToList();
+        SiteLnbModelBox.IsEnabled = manufacturer.Length > 0;
+    }
+
+    private void UpdateLnbInfo() =>
+        SiteLnbInfo.Text = SelectedSite is { } site && LnbCatalog.Find(site.LnbManufacturer, site.LnbModel) is { } lnb ? lnb.Summary : "";
+
+    private static List<Choice<bool?>> YesNo() => new bool?[] { null, true, false }.Select(v => new Choice<bool?>(v, MultiswitchTexts.Text(v))).ToList();
+
+    /// <summary>Selects the choice with this value; nothing for no site.</summary>
+    private static void Select(ComboBox box, object? value) =>
+        box.SelectedItem = box.ItemsSource.OfType<IChoice>().FirstOrDefault(c => Equals(c.BoxedValue, value));
+
     private static double? ParseNumber(string text, double min, double max)
     {
         text = text.Trim();
-        // Komma und Punkt annehmen, damit auch aus Karten kopierte Koordinaten passen
+        // Accept comma and dot so that coordinates copied from maps work too
         if (!double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out var v)
             && !double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out v))
             return null;
@@ -119,7 +191,7 @@ public partial class SettingsWindow : Window
 
     private async void SiteAddressBox_LostFocus(object sender, RoutedEventArgs e)
     {
-        // Automatisch nur, wenn sich die Adresse geändert hat
+        // Automatically only if the address has changed
         if (SelectedSite is { Address.Length: > 3 } site && site.Address != _geocodedAddress)
             await GeocodeAsync(site);
     }
@@ -169,7 +241,7 @@ public partial class SettingsWindow : Window
         }
     }
 
-    /// <summary>Blickrichtung zum Satelliten und Empfangserwartung des gewählten Standorts.</summary>
+    /// <summary>Look direction to the satellite and expected reception at the selected site.</summary>
     private void UpdateLookInfo()
     {
         var site = SelectedSite;
@@ -210,7 +282,7 @@ public partial class SettingsWindow : Window
 
     private void ReceiverKindBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateReceiverHint();
 
-    // ---------------------------------------------------------------- Allgemein
+    // ---------------------------------------------------------------- General
 
     private void LanguageBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -219,7 +291,7 @@ public partial class SettingsWindow : Window
 
     private void ReceiverConnection_Changed(object sender, RoutedEventArgs e) => UpdateReceiverHint();
 
-    /// <summary>Vollständig eingefügte Adresse wie "https://server:8443" auf Adresse, Port und HTTPS verteilen.</summary>
+    /// <summary>Split a fully pasted address like "https://server:8443" into address, port and HTTPS.</summary>
     private void ReceiverAddressBox_LostFocus(object sender, RoutedEventArgs e)
     {
         var text = ReceiverAddressBox.Text.Trim();
@@ -313,4 +385,16 @@ public partial class SettingsWindow : Window
         _settings.Save();
         SiteStore.Save(Sites);
     }
+}
+
+/// <summary>Entry of a selection list: value and display text.</summary>
+public sealed record Choice<T>(T Value, string Text) : IChoice
+{
+    public object? BoxedValue => Value;
+}
+
+/// <summary>Selection list entry independent of its value type – lets a nullable value select a plain one.</summary>
+public interface IChoice
+{
+    object? BoxedValue { get; }
 }

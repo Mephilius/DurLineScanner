@@ -80,6 +80,72 @@
                                     </StackPanel>
                                 </Grid>
 
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Hersteller des LNB" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteLnbMakerBox" DisplayMemberPath="Text" SelectionChanged="SiteLnbMakerBox_SelectionChanged"
+                                                  ToolTip="Nur Hersteller mit veröffentlichten Daten – sonst „unbekannt“ lassen und Typ und Verstärkung von Hand eintragen" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Modell des LNB" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteLnbModelBox" DisplayMemberPath="Text" SelectionChanged="SiteLnbModelBox_SelectionChanged"
+                                                  ToolTip="Übernimmt Typ und Verstärkung laut Hersteller – beides lässt sich danach noch ändern" />
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock x:Name="SiteLnbInfo" Style="{StaticResource Hint}" Margin="0,0,0,10" />
+
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="Typ des LNB" Style="{StaticResource FieldLabel}" />
+                                    <ComboBox x:Name="SiteLnbTypeBox" DisplayMemberPath="Text" SelectionChanged="SiteField_Changed"
+                                              ToolTip="Quattro: vier feste Ausgänge für einen Multischalter. Single/Twin/Quad/Octo: jeder Ausgang liefert die Ebene, die der Receiver wählt. Die Diagnose richtet ihre Prüfschritte danach aus." />
+                                </StackPanel>
+
+                                <TextBlock Text="Multischalter" FontWeight="SemiBold" Margin="0,2,0,6" />
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Art" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteSwitchKindBox" DisplayMemberPath="Text" SelectionChanged="SiteField_Changed"
+                                                  ToolTip="Aktive Multischalter verstärken, passive dämpfen nur" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Ausgangspegel regelbar" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteSwitchLevelBox" DisplayMemberPath="Text" SelectionChanged="SiteField_Changed"
+                                                  ToolTip="Welche Pegel sich am Multischalter einstellen lassen – die Diagnose sagt dann, ob der Regler ein Problem lösen kann" />
+                                    </StackPanel>
+                                </Grid>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="12" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="Schräglage (Slope) regelbar" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteSwitchSlopeBox" DisplayMemberPath="Text" SelectionChanged="SiteField_Changed"
+                                                  ToolTip="Entzerrung, die die höhere Kabeldämpfung bei hohen Frequenzen ausgleicht" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Quadtauglich" Style="{StaticResource FieldLabel}" />
+                                        <ComboBox x:Name="SiteSwitchQuadBox" DisplayMemberPath="Text" SelectionChanged="SiteField_Changed"
+                                                  ToolTip="Kann einen Quad-LNB statt eines Quattro-LNB betreiben" />
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="Modell" Style="{StaticResource FieldLabel}" />
+                                    <TextBox x:Name="SiteSwitchModelBox" TextChanged="SiteField_Changed"
+                                             ToolTip="Nur zur Dokumentation, z.B. „Spaun SMS 5803 NF“" />
+                                </StackPanel>
+
                                 <Border Background="#F7F9FC" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                                         CornerRadius="6" Padding="12,10">
                                     <StackPanel>

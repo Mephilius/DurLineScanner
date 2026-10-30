@@ -14,6 +14,7 @@ Schüsselgröße, Standort und Wetter.
 - **Komplette Scans** aller Transponder eines Satelliten per Bluetooth LE, gespeichert als Messreihen
 - **Übersicht** je Polarisation, eingefärbt nach Bewertung; Empfangslöcher und vermutlich abgeschaltete Transponder markiert
 - **Ebenen & Pegel**: Pegel, Ungleichgewicht und Schräglage je ZF-Ebene (Low/High × V/H) – zum Einstellen von Verstärker und Multischalter
+- **Diagnose**: erkennt Fehlerbilder (schlechter F-Stecker, Reflexionen, Einstrahlung, Übersteuerung, vertauschte Eingänge …) und verortet sie aus mehreren Scans in der Anlage – LNB, Stammleitung/Multischalter oder einzelne Dosenleitungen
 - **Live-Messung** mit Gauges (MER, C/N, Pegel, Qualität, Stärke, BER), Spitzenwert-Marken, Verlauf und Vollbild
 - **Mini-Scan**: bis zu 5 über eine Ebene verteilte Transponder, Minimum und Maximum in den Gauges
 - **Standorte**: Adresse mit automatischer Koordinatensuche (OpenStreetMap), Schüsselgröße, LNB-Verstärkung; Azimut, Elevation, Skew und zu erwartende MER

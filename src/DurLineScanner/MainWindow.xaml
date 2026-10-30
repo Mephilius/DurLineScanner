@@ -16,7 +16,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Kopfzeile: Titel und Gerät -->
+        <!-- Header: title and device -->
         <Grid Margin="2,0,2,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -50,7 +50,7 @@
             </Border>
         </Grid>
 
-        <!-- Messung einrichten -->
+        <!-- Measurement setup -->
         <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,12">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -66,7 +66,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- erste Zeile: Bedingungen -->
+                <!-- first row: conditions -->
                 <StackPanel Margin="0,0,12,0">
                     <TextBlock Text="Standort" Style="{StaticResource FieldLabel}" />
                     <DockPanel>
@@ -95,7 +95,7 @@
                     <Button x:Name="StopButton" Content="■  Stopp" Click="StopButton_Click" IsEnabled="False" MinWidth="80" />
                 </StackPanel>
 
-                <!-- zweite Zeile: Messort -->
+                <!-- second row: measurement location -->
                 <StackPanel Grid.Row="1" Margin="0,10,12,0">
                     <TextBlock Text="Messort" Style="{StaticResource FieldLabel}" />
                     <ComboBox x:Name="LocationKindBox" SelectedIndex="0" SelectionChanged="LocationKindBox_SelectionChanged">
@@ -124,7 +124,7 @@
                     </ComboBox>
                 </StackPanel>
 
-                <!-- dritte Zeile: Fortschritt, Transponder- und Senderliste -->
+                <!-- third row: progress, transponder and channel list -->
                 <Grid Grid.Row="2" Grid.ColumnSpan="5" Margin="0,12,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -150,7 +150,7 @@
             </Grid>
         </Border>
 
-        <!-- Inhalt -->
+        <!-- Content -->
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="330" MinWidth="240" />
@@ -158,12 +158,12 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Messreihen -->
+            <!-- Measurement series -->
             <Border Style="{StaticResource Card}">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" Text="Messreihen" Style="{StaticResource SectionTitle}" />
                     <TextBlock DockPanel.Dock="Top" Style="{StaticResource Hint}" Margin="0,0,0,8"
-                               Text="Auswählen = anzeigen · Häkchen = zum Vergleich einblenden" />
+                               Text="Auswählen = anzeigen · Häkchen = zum Vergleich und zur Diagnose hinzunehmen" />
                     <ComboBox x:Name="SessionFilterBox" DockPanel.Dock="Top" Margin="0,0,0,8"
                               SelectionChanged="SessionFilterBox_SelectionChanged" ToolTip="Messreihen nach Messort filtern" />
                     <ComboBox x:Name="WeatherFilterBox" DockPanel.Dock="Top" Margin="0,0,0,8"
@@ -321,6 +321,52 @@
                         </Grid>
                     </TabItem>
 
+                    <TabItem Header="Diagnose">
+                        <DockPanel Margin="6">
+                            <DockPanel DockPanel.Dock="Top" Margin="0,4,0,10">
+                                <Button DockPanel.Dock="Right" Content="Alle Messreihen des Standorts ankreuzen" Click="SiteSessionsButton_Click"
+                                        Margin="12,0,0,0" VerticalAlignment="Center"
+                                        ToolTip="Hakt alle Messreihen mit demselben Standort und Satelliten wie die angezeigte an" />
+                                <TextBlock x:Name="DiagnosisScope" Style="{StaticResource Hint}" VerticalAlignment="Center" />
+                            </DockPanel>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl x:Name="FindingList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderThickness="4,0,0,0" BorderBrush="{Binding Accent}" Background="{Binding Background}"
+                                                    CornerRadius="4" Padding="12,8" Margin="0,0,0,8">
+                                                <StackPanel>
+                                                    <DockPanel>
+                                                        <TextBlock DockPanel.Dock="Right" Text="{Binding SeverityText}" Foreground="{Binding Accent}"
+                                                                   FontWeight="SemiBold" Margin="12,0,0,0" />
+                                                        <TextBlock Text="{Binding Finding.Title}" FontWeight="SemiBold" FontSize="14" TextWrapping="Wrap" />
+                                                    </DockPanel>
+                                                    <TextBlock Text="{Binding Finding.Evidence}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                                    <Grid Margin="0,6,0,0" Visibility="{Binding WhereVisibility}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="120" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{l:T 'Vermuteter Ort'}" Style="{StaticResource Hint}" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Finding.Where}" TextWrapping="Wrap" />
+                                                    </Grid>
+                                                    <Grid Margin="0,4,0,0" Visibility="{Binding NextStepVisibility}">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="120" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{l:T 'Nächster Schritt'}" Style="{StaticResource Hint}" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Finding.NextStep}" TextWrapping="Wrap" />
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </TabItem>
+
                     <TabItem Header="Tabelle">
                         <DataGrid x:Name="ResultGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="6"
                                   HeadersVisibility="Column" CanUserAddRows="False" GridLinesVisibility="Horizontal">
@@ -341,7 +387,7 @@
                                 </Style>
                             </DataGrid.RowStyle>
                             <DataGrid.Resources>
-                                <!-- Beim Überfahren der Transponderspalten die Programme anzeigen -->
+                                <!-- Show the programs when hovering over the transponder columns -->
                                 <Style x:Key="TransponderCell" TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                     <Setter Property="ToolTip" Value=" " />
                                     <Setter Property="ToolTipService.ShowDuration" Value="2147483647" />

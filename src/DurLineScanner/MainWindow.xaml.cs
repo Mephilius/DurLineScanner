@@ -32,7 +32,7 @@ public partial class MainWindow : Window
     private static readonly Color GridColor = Color.FromHex("#EDEDED");
     private static readonly Color AxisColor = Color.FromHex("#616161");
 
-    // Reihenfolge entspricht Plane.All: Low V, Low H, High V, High H
+    // Order matches Plane.All: Low V, Low H, High V, High H
     private static readonly Color[] SeriesColors =
     [
         Color.FromHex("#005FB8"), Color.FromHex("#C239B3"), Color.FromHex("#00A2AD"),
@@ -86,23 +86,23 @@ public partial class MainWindow : Window
         ConfigureGauges(null);
         RenderCharts();
         ApplySessionFilter();
-        ShowFirstSessionOfSite(); // neueste Messreihe des Standorts anzeigen
+        ShowFirstSessionOfSite(); // show the site's latest measurement series
         Loaded += async (_, _) =>
         {
             _ = RefreshDevicesAsync();
-            // Die Transponderliste wird nicht mitgeliefert – beim ersten Start herunterladen
+            // The transponder list is not bundled – download it on first launch
             if (_database.Catalog is null) await DownloadTransponderListAsync();
             if (_settings.LoadChannelsOnStart && _settings.ReceiverConfigured) await LoadChannelsFromReceiverAsync();
         };
     }
 
-    /// <summary>"v0.9.2" aus der beim Release gesetzten Version; lokale Builds (0.0.0-dev) als Entwicklungsversion.</summary>
+    /// <summary>"v0.9.2" from the version set at release; local builds (0.0.0-dev) as development version.</summary>
     private static string VersionLabel()
     {
         var info = System.Reflection.Assembly.GetExecutingAssembly()
             .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
             .OfType<System.Reflection.AssemblyInformationalVersionAttribute>().FirstOrDefault()?.InformationalVersion ?? "";
-        var version = info.Split('+')[0]; // Commit-Kennung abschneiden
+        var version = info.Split('+')[0]; // strip the commit id
         return version.Length == 0 || version.EndsWith("-dev") ? L.T("Entwicklungsversion") : "v" + version;
     }
 
@@ -114,7 +114,7 @@ public partial class MainWindow : Window
 
     private Conditions CurrentConditions => new(SelectedSite, SelectedWeather, SelectedSatellite?.Longitude ?? 19.2);
 
-    // ---------------------------------------------------------------- Verbindung
+    // ---------------------------------------------------------------- Connection
 
     private async void ConnectButton_Click(object sender, RoutedEventArgs e)
     {
@@ -151,7 +151,7 @@ public partial class MainWindow : Window
             }
             catch (InvalidOperationException) when (DeviceBox.SelectedItem is null && ReadSavedAddress() is not null)
             {
-                // Gespeicherte Adresse passt nicht mehr – neu suchen
+                // Saved address no longer matches – search again
                 File.Delete(AddressFile);
                 var found = await Sf4000Client.FindDeviceAsync(TimeSpan.FromSeconds(15))
                             ?? throw new InvalidOperationException(L.T("Kein SF 4000 gefunden."));
@@ -178,7 +178,7 @@ public partial class MainWindow : Window
 
     private async void RefreshDevicesButton_Click(object sender, RoutedEventArgs e) => await RefreshDevicesAsync();
 
-    /// <summary>Geräteliste neu füllen; vorausgewählt wird das SF 4000 („Finder …“), bevorzugt das zuletzt benutzte.</summary>
+    /// <summary>Refill the device list; preselects the SF 4000 ("Finder …"), preferring the last one used.</summary>
     private async Task RefreshDevicesAsync()
     {
         RefreshDevicesButton.IsEnabled = false;
@@ -240,7 +240,7 @@ public partial class MainWindow : Window
         File.WriteAllText(AddressFile, address.ToString("X12"));
     }
 
-    // ---------------------------------------------------------------- Einstellungen, Standort und Wetter
+    // ---------------------------------------------------------------- Settings, site and weather
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e) => OpenSettings(showReceiver: false);
 
@@ -248,7 +248,7 @@ public partial class MainWindow : Window
 
     private HelpWindow? _help;
 
-    /// <summary>Hilfe nicht modal, damit man beim Lesen weiterarbeiten kann; nur ein Fenster gleichzeitig.</summary>
+    /// <summary>Help is modeless so you can keep working while reading; only one window at a time.</summary>
     private void OpenHelp()
     {
         if (_help is not null)
@@ -269,6 +269,7 @@ public partial class MainWindow : Window
         window.ShowDialog();
         _sites = window.Sites;
         UpdateSiteBox(SelectedSite?.Id ?? _sites.FirstOrDefault()?.Id);
+        RenderCharts(); // LNB or multiswitch may have changed
         if (window.ChannelsLoaded) UpdateChannelSource();
         UpdateReceiverButton();
     }
@@ -291,7 +292,7 @@ public partial class MainWindow : Window
             var where = site.HasCoordinates
                 ? L.F("{0:0.000}° N, {1:0.000}° O", site.Latitude, site.Longitude)
                 : L.T("ohne Koordinaten");
-            SiteBox.ToolTip = L.F("{0}\n{1}\n{2}\nSchüssel {3} cm · LNB {4:0.#} dB", site.Name, site.Address, where, site.DishCm, site.LnbGainDb);
+            SiteBox.ToolTip = L.F("{0}\n{1}\n{2}\nSchüssel {3} cm · LNB {4:0.#} dB, {5}", site.Name, site.Address, where, site.DishCm, site.LnbGainDb, LnbTypes.Text(site.LnbType));
         }
         UpdateLocationLists();
         ApplySessionFilter();
@@ -345,7 +346,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // ---------------------------------------------------------------- Satellit und Transponderliste
+    // ---------------------------------------------------------------- Satellite and transponder list
 
     private void SatelliteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -357,7 +358,7 @@ public partial class MainWindow : Window
         SetStatus(L.F("{0}: {1} Transponder in der Liste.", sat.Name, tps.Count));
     }
 
-    /// <summary>Satellitenliste aus der Transponderliste neu aufbauen; die Auswahl bleibt bei derselben Position.</summary>
+    /// <summary>Rebuild the satellite list from the transponder list; the selection stays on the same position.</summary>
     private void RefreshSatellites()
     {
         var previous = SelectedSatellite;
@@ -410,7 +411,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // ---------------------------------------------------------------- Senderliste
+    // ---------------------------------------------------------------- Channel list
 
     private int PositionTenths => (int)Math.Round((SelectedSatellite?.Longitude ?? 19.2) * 10);
 
@@ -582,7 +583,7 @@ public partial class MainWindow : Window
         PlaneFilterBox.IsEnabled = !busy;
     }
 
-    // ---------------------------------------------------------------- Live-Messung
+    // ---------------------------------------------------------------- Live measurement
 
     private void LivePlaneBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -590,7 +591,7 @@ public partial class MainWindow : Window
         UpdateLiveTransponders();
     }
 
-    /// <summary>Transponder der gewählten Ebene; aus der angezeigten Messreihe mit ★-Vorschlag, sonst aus der Liste.</summary>
+    /// <summary>Transponders of the selected plane; from the displayed measurement series with ★ suggestion, otherwise from the list.</summary>
     private void UpdateLiveTransponders()
     {
         if (!IsInitialized || SelectedSatellite is not { } sat || LivePlaneBox.SelectedItem is not PlaneOption { Plane: var plane }) return;
@@ -626,7 +627,7 @@ public partial class MainWindow : Window
 
     private bool _jumpingToChannel;
 
-    /// <summary>Filtert die Senderliste beim Tippen (Teilstring, ohne Groß-/Kleinschreibung).</summary>
+    /// <summary>Filters the channel list while typing (substring, case-insensitive).</summary>
     private void LiveChannelBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key is System.Windows.Input.Key.Up or System.Windows.Input.Key.Down or System.Windows.Input.Key.Enter
@@ -639,12 +640,12 @@ public partial class MainWindow : Window
             : o => ((ChannelOnTransponder)o).Channel.Name.Contains(text.Trim(), StringComparison.CurrentCultureIgnoreCase);
         LiveChannelBox.IsDropDownOpen = true;
 
-        // Cursor ans Ende, sonst markiert die ComboBox den getippten Text
+        // Cursor to the end, otherwise the ComboBox selects the typed text
         if (LiveChannelBox.Template.FindName("PART_EditableTextBox", LiveChannelBox) is TextBox box)
             box.SelectionStart = box.Text.Length;
     }
 
-    /// <summary>Sender gewählt: Ebene und Transponder automatisch umstellen.</summary>
+    /// <summary>Channel selected: switch plane and transponder automatically.</summary>
     private void LiveChannelBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (LiveChannelBox.SelectedItem is not ChannelOnTransponder channel || SelectedSatellite is not { } sat) return;
@@ -660,7 +661,7 @@ public partial class MainWindow : Window
                                                     && Math.Abs(o.Transponder.FrequencyMHz - channel.FrequencyMHz) <= 2);
             if (match is null)
             {
-                // Transponder nicht in der Messreihe – aus der Transponderliste ergänzen
+                // Transponder not in the measurement series – add it from the transponder list
                 var tp = _database.GetTransponders(sat).FirstOrDefault(t => t.Polarization == channel.Pol
                                                                             && Math.Abs(t.FrequencyMHz - channel.FrequencyMHz) <= 2)
                          ?? new Transponder(channel.FrequencyMHz, channel.Pol, 27500);
@@ -683,7 +684,7 @@ public partial class MainWindow : Window
         ConfigureGauges(tp);
         if (!_jumpingToChannel && LiveChannelBox.SelectedItem is not null)
         {
-            // Transponder von Hand gewechselt – gewählter Sender passt nicht mehr
+            // Transponder changed by hand – selected channel no longer matches
             LiveChannelBox.SelectedItem = null;
             LiveChannelBox.Text = "";
         }
@@ -693,11 +694,11 @@ public partial class MainWindow : Window
             var count = ChannelList.Current?.Get(PositionTenths, tp.FrequencyMHz, tp.Polarization).Count(c => c.Kind != ChannelKind.Data) ?? 0;
             if (count > 0) LiveInfoText.Text += "  ·  " + L.F("{0} Programme", count);
         }
-        // Während der Messung sofort umschalten
+        // Switch immediately during measurement
         if (_liveCts is not null) _liveTarget = tp;
     }
 
-    /// <summary>Skalen der Gauges für den Transponder: MER/C/N hängen von Modulation und FEC ab.</summary>
+    /// <summary>Gauge scales for the transponder: MER/C/N depend on modulation and FEC.</summary>
     private void ConfigureGauges(Transponder? tp)
     {
         var (threshold, basis) = SignalLimits.Threshold(tp?.DvbSystem, tp?.Modulation, tp?.Fec);
@@ -724,14 +725,14 @@ public partial class MainWindow : Window
 
     private GaugeControl[] Gauges => [GaugeMer, GaugeCn, GaugeLevel, GaugeQuality, GaugeStrength, GaugeBer];
 
-    // ---------------------------------------------------------------- Mini-Scan der Ebene
+    // ---------------------------------------------------------------- Mini scan of the plane
 
     private async void MiniScanButton_Click(object sender, RoutedEventArgs e)
     {
         if (SelectedSatellite is not { } sat || !_client.IsConnected) return;
         if (_liveCts is not null)
         {
-            // Die laufende Live-Schleife führt den Mini-Scan aus und stellt danach zurück
+            // The running live loop performs the mini scan and switches back afterwards
             _miniScanRequested = true;
             MiniScanButton.IsEnabled = false;
             return;
@@ -768,19 +769,19 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>Bis zu 5 Transponder gleichmäßig über die Frequenz der Ebene; bekannte Löcher und abgeschaltete werden übersprungen.</summary>
+    /// <summary>Up to 5 transponders spread evenly across the plane's frequency range; known gaps and switched-off ones are skipped.</summary>
     private List<Transponder> MiniScanTransponders(Satellite sat, Plane plane)
     {
         var session = _shownSession is { Results.Count: > 0 } s && SameSatellite(s, sat) ? s : null;
         var measured = session?.Results.Where(r => Plane.Of(r) == plane).ToList() ?? [];
         bool Same(Transponder t, ScanResult r) => t.Polarization == r.Polarization && Math.Abs(t.FrequencyMHz - r.FrequencyMHz) <= 2;
 
-        // Liste der Ebene ohne Transponder, die in der Messreihe keinen Lock hatten
+        // List of the plane without transponders that had no lock in the measurement series
         var all = _database.GetTransponders(sat)
             .Where(t => new Plane(t.FrequencyMHz >= 11700, t.Polarization) == plane)
             .Where(t => !measured.Any(r => !r.Locked && Same(t, r)))
             .ToList();
-        // Gelockte Transponder der Messreihe, die in der Liste fehlen (ältere Liste), ergänzen
+        // Add locked transponders of the measurement series that are missing from the list (older list)
         all.AddRange(measured.Where(r => r.Locked && !all.Any(t => Same(t, r)))
             .Select(r => new Transponder(r.FrequencyMHz, r.Polarization, r.SymbolRateKs, r.DvbSystem, r.Modulation, r.Fec)));
         all = all.Where(t => Sf4000Protocol.EncodeTune(t, sat.LofLow, sat.LofHigh) is not null).OrderBy(t => t.FrequencyMHz).ToList();
@@ -820,7 +821,7 @@ public partial class MainWindow : Window
                   + $"  ({string.Join(", ", results.Select(r => $"{r.FrequencyMHz} {r.PolarizationShort}{(r.Locked ? "" : " ✗")}"))})");
     }
 
-    /// <summary>Minimum und Maximum des Mini-Scans als Bereich in den Gauges.</summary>
+    /// <summary>Minimum and maximum of the mini scan as a range in the gauges.</summary>
     private void ShowMiniRange(List<ScanResult> results)
     {
         var locked = results.Where(r => r.Locked).ToList();
@@ -830,7 +831,7 @@ public partial class MainWindow : Window
         Set(GaugeLevel, tuned.Select(r => r.LevelDbuV), v => v.ToString("0.0"));
         Set(GaugeQuality, tuned.Select(r => (double?)r.QualityPercent), v => v.ToString("0"));
         Set(GaugeStrength, tuned.Select(r => (double?)r.StrengthPercent), v => v.ToString("0"));
-        // Exponent → BER; der größere Exponent ist die kleinere (bessere) Fehlerrate
+        // Exponent → BER; the larger exponent is the smaller (better) error rate
         Set(GaugeBer, locked.Select(r => SignalLimits.BerToExponent(r.Ber)), v => Math.Pow(10, -v).ToString("0.0E+0"));
 
         static void Set(GaugeControl g, IEnumerable<double?> values, Func<double, string> format)
@@ -880,7 +881,7 @@ public partial class MainWindow : Window
                         _miniScanRequested = false;
                         SetBusy(scanning: false);
                     }
-                    tuned = null; // zurück auf den Live-Transponder
+                    tuned = null; // back to the live transponder
                     continue;
                 }
 
@@ -937,7 +938,7 @@ public partial class MainWindow : Window
 
     private void LiveStopButton_Click(object sender, RoutedEventArgs e) => _liveCts?.Cancel();
 
-    // ---------------------------------------------------------------- Vollbild der Live-Messung
+    // ---------------------------------------------------------------- Live measurement full screen
 
     private Window? _fullscreen;
 
@@ -958,9 +959,9 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Nimmt den Inhalt der Live-Registerkarte in ein randloses Vollbildfenster auf dem aktuellen Bildschirm
-    /// und gibt ihn beim Schließen an die Registerkarte zurück. Dieselben Steuerelemente werden verschoben,
-    /// daher läuft eine laufende Messung ohne Unterbrechung weiter.
+    /// Moves the content of the live tab into a borderless full-screen window on the current screen
+    /// and returns it to the tab on close. The same controls are moved,
+    /// so a running measurement continues without interruption.
     /// </summary>
     private void ToggleFullscreen()
     {
@@ -989,7 +990,7 @@ public partial class MainWindow : Window
             FontSize = 15,
             Content = host,
             ShowInTaskbar = false,
-            // Auf dem Bildschirm des Hauptfensters maximieren
+            // Maximize on the main window's screen
             WindowStartupLocation = WindowStartupLocation.Manual,
             Left = Left + 50,
             Top = Top + 50,
@@ -1091,7 +1092,7 @@ public partial class MainWindow : Window
         PlotLive.Refresh();
     }
 
-    // ---------------------------------------------------------------- Messreihen
+    // ---------------------------------------------------------------- Measurement series
 
     private void LoadSessions()
     {
@@ -1105,11 +1106,11 @@ public partial class MainWindow : Window
         UpdateLocationLists();
     }
 
-    /// <summary>Messreihe vom selben Satelliten? Verglichen wird die Orbitposition, der Name hängt von der Liste ab.</summary>
+    /// <summary>Measurement series from the same satellite? Compares the orbital position; the name depends on the list.</summary>
     private static bool SameSatellite(ScanSession session, Satellite sat) =>
         Math.Abs(session.SatelliteLongitude - sat.Longitude) < 0.15;
 
-    /// <summary>Ältere Messreihen (Liste ohne Modulation) aus der aktuellen Transponderliste ergänzen.</summary>
+    /// <summary>Complete older measurement series (list without modulation) from the current transponder list.</summary>
     private void AddMissingModulation(ScanSession session)
     {
         var sat = (SatelliteBox.ItemsSource as IEnumerable<Satellite>)?.FirstOrDefault(s => SameSatellite(session, s) && s.LofHigh >= 8000);
@@ -1184,7 +1185,7 @@ public partial class MainWindow : Window
     private void OpenFolderButton_Click(object sender, RoutedEventArgs e) =>
         Process.Start(new ProcessStartInfo(_store.Folder) { UseShellExecute = true });
 
-    // ---------------------------------------------------------------- Standort-Archiv (ZIP)
+    // ---------------------------------------------------------------- Site archive (ZIP)
 
     private void ExportSiteButton_Click(object sender, RoutedEventArgs e)
     {
@@ -1241,7 +1242,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // ---------------------------------------------------------------- Messorte
+    // ---------------------------------------------------------------- Measurement locations
 
     private static string AllLocations => L.T("Alle Messorte");
 
@@ -1259,7 +1260,7 @@ public partial class MainWindow : Window
         OutletBox.ItemsSource = Enumerable.Range(1, port ? 16 : 12).Select(i => port ? L.F("Port {0}", i) : L.F("Anschluss {0}", i)).ToList();
         OutletBox.SelectedIndex = Math.Min(outlet, OutletBox.Items.Count - 1);
 
-        // Tag = gespeicherter Wert, Content = Anzeige
+        // Tag = stored value, Content = display
         string[] tags = ["alle", "Low V", "Low H", "High V", "High H"];
         for (int i = 0; i < PlaneFilterBox.Items.Count; i++)
         {
@@ -1274,10 +1275,10 @@ public partial class MainWindow : Window
 
     private static string AllWeather => L.T("Jedes Wetter");
 
-    /// <summary>Raumvorschläge (bereits gemessene zuerst) und Filterliste aus den bisherigen Messreihen.</summary>
+    /// <summary>Room suggestions (already measured ones first) and filter list from the existing measurement series.</summary>
     private void UpdateLocationLists()
     {
-        // Vorschläge und Filter nur aus den Messreihen des gewählten Standorts
+        // Suggestions and filters only from the measurement series of the selected site
         var ofSite = _sessions.Where(s => OfSelectedSite(s.Session)).ToList();
         var typed = RoomBox.Text;
         var measured = ofSite.Select(s => s.Session.Room).OfType<string>()
@@ -1297,10 +1298,10 @@ public partial class MainWindow : Window
 
     private void SessionFilterBox_SelectionChanged(object sender, SelectionChangedEventArgs e) => ApplySessionFilter();
 
-    /// <summary>Messreihe gehört zum oben gewählten Standort? Ohne gewählten Standort zählen alle.</summary>
+    /// <summary>Does the measurement series belong to the site selected above? Without a selected site, all count.</summary>
     private bool OfSelectedSite(ScanSession s) => SelectedSite is not { } site || s.Site?.Id == site.Id;
 
-    /// <summary>Liste der Messreihen: nur der gewählte Standort, dazu die Filter nach Messort und Wetter.</summary>
+    /// <summary>List of measurement series: only the selected site, plus the filters by measurement location and weather.</summary>
     private void ApplySessionFilter()
     {
         if (!IsInitialized) return;
@@ -1314,10 +1315,10 @@ public partial class MainWindow : Window
         };
     }
 
-    /// <summary>Nach einem Standortwechsel: neueste Messreihe des Standorts zeigen, bei leerem Standort nichts.</summary>
+    /// <summary>After a site change: show the site's latest measurement series, nothing for an empty site.</summary>
     private void ShowFirstSessionOfSite()
     {
-        if (_scanCts is not null) return; // ein laufender Scan bleibt sichtbar
+        if (_scanCts is not null) return; // a running scan stays visible
         foreach (var item in _sessions.Where(i => i.IsCompared && !OfSelectedSite(i.Session)))
             item.IsCompared = false;
 
@@ -1326,7 +1327,7 @@ public partial class MainWindow : Window
         if (first is null) ShowSession(new ScanSession());
     }
 
-    /// <summary>Alle Messreihen mit Standort, Satellit und Wetter der angezeigten zum Vergleich anhaken.</summary>
+    /// <summary>Check all measurement series with the displayed one's site, satellite and weather for comparison.</summary>
     private void SameConditionsButton_Click(object sender, RoutedEventArgs e)
     {
         if (_shownSession is not { Results.Count: > 0 } shown)
@@ -1349,7 +1350,7 @@ public partial class MainWindow : Window
             : L.F("{0} Messreihen mit gleichem Standort und Wetter ({1}) zum Vergleich angehakt.", count, shown.WeatherText));
     }
 
-    // ---------------------------------------------------------------- Diagramme
+    // ---------------------------------------------------------------- Charts
 
     private sealed record MetricInfo(
         string Label,
@@ -1381,6 +1382,46 @@ public partial class MainWindow : Window
         RenderLegend(compared.Count > 0);
         RenderPlanes(session);
         RenderCompare(session, compared);
+        RenderDiagnosis(session, compared);
+    }
+
+    /// <summary>Diagnosis of the displayed measurement series plus all checked ones of the same satellite.</summary>
+    private void RenderDiagnosis(ScanSession session, List<SessionItem> compared)
+    {
+        bool SameSat(ScanSession s) => Math.Abs(s.SatelliteLongitude - session.SatelliteLongitude) < 0.15;
+        var selected = new[] { session }.Concat(compared.Select(c => c.Session)).Where(s => s.Results.Count > 0 && SameSat(s)).ToList();
+        int otherSatellite = compared.Count(c => !SameSat(c.Session));
+        var history = _sessions.Select(i => i.Session).Where(SameSat);
+        // LNB and multiswitch from the current site settings – older scans carry a copy of the site without them
+        var setup = session.Site is { } site ? _sites.FirstOrDefault(x => x.Id == site.Id) ?? site : null;
+        FindingList.ItemsSource = Diagnosis.Analyze(selected, history, setup).Select(f => new FindingItem(f)).ToList();
+
+        DiagnosisScope.Text = selected.Count switch
+        {
+            0 => L.T("Keine Messreihe angezeigt."),
+            1 => L.T("Ein Scan: Die Diagnose betrifft den ganzen Signalweg bis zu diesem Messort. Weitere Messreihen ankreuzen (andere Dosen, LNB-Port), um den Fehler in der Anlage einzugrenzen."),
+            _ => L.F("{0} Scans: angezeigte Messreihe plus {1} mit Häkchen. Was an allen Dosen auftritt, liegt vor dem Multischalter; was nur an einzelnen auftritt, in deren Leitung.", selected.Count, selected.Count - 1),
+        } + (otherSatellite > 0 ? " " + L.F("{0} angekreuzte Messreihen eines anderen Satelliten sind nicht einbezogen.", otherSatellite) : "");
+    }
+
+    /// <summary>Check all measurement series with the displayed one's site and satellite for the diagnosis.</summary>
+    private void SiteSessionsButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_shownSession is not { Results.Count: > 0 } shown)
+        {
+            SetStatus(L.T("Bitte zuerst eine Messreihe anzeigen."));
+            return;
+        }
+        int count = 0;
+        foreach (var item in _sessions)
+        {
+            var s = item.Session;
+            bool same = s != shown && Math.Abs(s.SatelliteLongitude - shown.SatelliteLongitude) < 0.15 && s.Site?.Id == shown.Site?.Id;
+            item.IsCompared = same;
+            if (same) count++;
+        }
+        RenderCharts();
+        SetStatus(L.F("{0} weitere Messreihen des Standorts angehakt.", count));
     }
 
     private void RenderPolarization(WpfPlot control, Polarization pol, ScanSession session, List<SessionItem> compared)
@@ -1392,7 +1433,7 @@ public partial class MainWindow : Window
         var results = session.Results.Where(r => r.Polarization == pol).ToList();
         double top = metric.Max;
 
-        // Empfangslöcher rot hinterlegt, vermutlich abgeschaltete Transponder grau
+        // Reception gaps shaded red, presumably switched-off transponders gray
         var background = results.Where(r => !r.Locked).Select(r => new Bar
         {
             Position = r.FrequencyMHz,
@@ -1427,7 +1468,7 @@ public partial class MainWindow : Window
             line.LegendText = L.F("{0}  {1:dd.MM. HH:mm}", compared[i].Session.LocationLabel, compared[i].Session.Started);
         }
 
-        // Grenze Low/High-Band
+        // Low/high band boundary
         var split = plot.Add.VerticalLine(11700, 1, Color.FromHex("#9E9E9E"));
         split.LinePattern = LinePattern.Dashed;
         split.Text = "Low | High";
@@ -1470,7 +1511,7 @@ public partial class MainWindow : Window
         var stats = PlaneAnalysis.Analyze(session);
         PlaneGrid.ItemsSource = stats;
 
-        // Pegel je Transponder über ZF, eine Farbe je Ebene – Unterschiede und Schräglage sind direkt sichtbar
+        // Level per transponder over IF, one color per plane – differences and tilt are directly visible
         var plot = PlotPlanes.Plot;
         plot.Clear();
         AddLevelBands(plot);
@@ -1505,7 +1546,7 @@ public partial class MainWindow : Window
         PlotPlanes.Refresh();
     }
 
-    /// <summary>Farbige Hintergrundbänder für die Pegelbewertung.</summary>
+    /// <summary>Colored background bands for the level rating.</summary>
     private static void AddLevelBands(Plot plot)
     {
         foreach (var band in SignalLimits.Level.Bands)
@@ -1535,7 +1576,7 @@ public partial class MainWindow : Window
         }).ToList();
         CompareGrid.ItemsSource = rows;
 
-        // Gruppierte Balken: pro Ebene ein Balken je Messreihe
+        // Grouped bars: per plane one bar per measurement series
         var plot = PlotCompare.Plot;
         plot.Clear();
         AddLevelBands(plot);
@@ -1632,7 +1673,7 @@ public partial class MainWindow : Window
         public void Reset() => Mer = Cn = Level = Quality = Strength = Ber = null;
     }
 
-    /// <summary>Verlauf der Live-Messung, begrenzt auf die letzten 10 Minuten bei ~1 Messung/s.</summary>
+    /// <summary>Live measurement history, limited to the last 10 minutes at ~1 measurement/s.</summary>
     private sealed class LiveHistory
     {
         private const int MaxPoints = 600;
@@ -1680,6 +1721,36 @@ public sealed record ReferenceOption(Transponder Transponder, string Label)
 public sealed record CompareRow(
     string Location, DateTime Started, string Site, string Weather, string Light, string LockText, int Holes,
     double? LowV, double? LowH, double? HighV, double? HighH, double? Mer, string Notes);
+
+public sealed class FindingItem(Finding finding)
+{
+    public Finding Finding { get; } = finding;
+
+    public string SeverityText => Finding.Severity switch
+    {
+        Severity.Warning => L.T("deutlich"),
+        Severity.Hint => L.T("Hinweis"),
+        _ => L.T("Info"),
+    };
+
+    public Brush Accent => Finding.Severity switch
+    {
+        Severity.Warning => Palette.Brush(Palette.Bad),
+        Severity.Hint => Palette.Brush(MediaColor.FromRgb(0xF2, 0xB1, 0x0C)),
+        _ => Palette.Brush(Palette.VeryGood),
+    };
+
+    public Brush Background => Finding.Severity switch
+    {
+        Severity.Warning => Palette.Brush(MediaColor.FromRgb(0xFD, 0xE7, 0xE6)),
+        Severity.Hint => Palette.Brush(MediaColor.FromRgb(0xFF, 0xF4, 0xE0)),
+        _ => Palette.Brush(MediaColor.FromRgb(0xE8, 0xF5, 0xEC)),
+    };
+
+    public Visibility WhereVisibility => Finding.Where.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility NextStepVisibility => Finding.NextStep.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+}
 
 public sealed class SessionItem(string path, ScanSession session) : INotifyPropertyChanged
 {
